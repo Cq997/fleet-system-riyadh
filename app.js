@@ -146,7 +146,6 @@ function loadDemoData() {
   populatePlateDropdowns();
   fillSectorFilters();
   updateDashboard();
-  showToast('⚠️ وضع العرض التجريبي - يرجى ربط Google Sheets', 'error');
 }
 
 // ====== تعبئة قوائم اللوحات ======
@@ -968,11 +967,6 @@ async function submitOil(e) {
 
 // ====== إرسال البيانات إلى Google Sheets ======
 async function sendToSheets(data) {
-  if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
-    console.log('Google Sheets غير مربوط - البيانات محفوظة محلياً:', data);
-    return;
-  }
-
   try {
     await fetch(SCRIPT_URL, {
       method: 'POST',
