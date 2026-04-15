@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة صيانة وتشغيل الأسطول | هيئة الهلال الأحمر السعودي - منطقة الرياض</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚑</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- زر القائمة للجوال -->
+<button class="menu-toggle" onclick="toggleSidebar()" title="القائمة">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- ====== الشريط الجانبي ====== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">🌙</div>
+    <div class="sidebar-title">هيئة الهلال الأحمر السعودي</div>
+    <div class="sidebar-subtitle">منصة صيانة وتشغيل الأسطول<br>منطقة الرياض</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">لوحة التحكم</div>
+    <button class="nav-btn active" onclick="showPage('dashboard')" id="btn-dashboard">
+      <span class="nav-icon">📊</span>
+      <span>لوحة القائد</span>
+      <span class="nav-badge" id="alertBadge" style="display:none">0</span>
+    </button>
+
+    <div class="nav-section-title">النماذج التشغيلية</div>
+    <button class="nav-btn" onclick="showPage('fleet')" id="btn-fleet">
+      <span class="nav-icon">🚑</span>
+      <span>الأسطول</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('tracking')" id="btn-tracking">
+      <span class="nav-icon">📍</span>
+      <span>رصد المركبات</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('accidents')" id="btn-accidents">
+      <span class="nav-icon">🚧</span>
+      <span>الحوادث</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('maintenance')" id="btn-maintenance">
+      <span class="nav-icon">🔧</span>
+      <span>الصيانة الوقائية</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('oil')" id="btn-oil">
+      <span class="nav-icon">🛢️</span>
+      <span>تغيير الزيت</span>
+    </button>
+
+    <div class="nav-section-title">التقارير</div>
+    <button class="nav-btn" onclick="showPage('reports')" id="btn-reports">
+      <span class="nav-icon">📈</span>
+      <span>التقارير والإحصائيات</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div>👤 قائد الأسطول: ثامر عياد الحربي</div>
+    <div>💻 تطوير: علي 102459@srca</div>
+    <div id="connectionStatus" class="connection-status" style="justify-content:center;margin-top:5px">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">جاري الاتصال...</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ====== المحتوى الرئيسي ====== -->
+<main class="main" id="mainContent">
+
+  <!-- ======================================
+       📊 لوحة القائد
+  ====================================== -->
+  <section id="page-dashboard" class="page-section">
+    <div class="page-header">
+      <h2>📊 لوحة القائد</h2>
+      <div class="page-header-actions">
+        <button class="btn btn-secondary btn-sm" onclick="refreshDashboard()">🔄 تحديث</button>
+        <button class="btn btn-info btn-sm" onclick="exportReportPDF()">📄 تصدير PDF</button>
+      </div>
+    </div>
+
+    <!-- فلترة التقارير -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>نوع التقرير</label>
+        <select id="reportType" onchange="updateDateRange()">
+          <option value="monthly">شهري</option>
+          <option value="quarterly">ربع سنوي</option>
+          <option value="annual">سنوي</option>
+          <option value="custom">مخصص</option>
+        </select>
+      </div>
+      <div class="filter-group" id="quarterGroup" style="display:none">
+        <label>الربع</label>
+        <select id="quarterSelect">
+          <option value="1">الربع الأول (يناير - مارس)</option>
+          <option value="2">الربع الثاني (أبريل - يونيو)</option>
+          <option value="3">الربع الثالث (يوليو - سبتمبر)</option>
+          <option value="4">الربع الرابع (أكتوبر - ديسمبر)</option>
+        </select>
+      </div>
+      <div class="filter-group" id="monthGroup">
+        <label>الشهر</label>
+        <select id="monthSelect">
+          <option value="1">يناير</option><option value="2">فبراير</option>
+          <option value="3">مارس</option><option value="4">أبريل</option>
+          <option value="5">مايو</option><option value="6">يونيو</option>
+          <option value="7">يوليو</option><option value="8">أغسطس</option>
+          <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
+          <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>السنة</label>
+        <select id="yearSelect"></select>
+      </div>
+      <div class="filter-group" id="customDateGroup" style="display:none">
+        <label>من تاريخ</label>
+        <input type="date" id="fromDate">
+      </div>
+      <div class="filter-group" id="customDateGroup2" style="display:none">
+        <label>إلى تاريخ</label>
+        <input type="date" id="toDate">
+      </div>
+      <div class="filter-group">
+        <label>القطاع</label>
+        <select id="filterSector"><option value="">الكل</option></select>
+      </div>
+      <div class="filter-group">
+        <label>الحالة</label>
+        <select id="filterStatus">
+          <option value="">الكل</option>
+          <option value="عاملة">عاملة</option>
+          <option value="خارج الخدمة">خارج الخدمة</option>
+          <option value="صيانة">صيانة</option>
+        </select>
+      </div>
+      <div class="filter-group" style="justify-content:flex-end">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="applyDashboardFilter()">🔍 تطبيق</button>
+      </div>
+    </div>
+
+    <!-- التنبيهات الهامة -->
+    <div id="alertsContainer" class="alerts-container"></div>
+
+    <!-- الإحصائيات الرئيسية -->
+    <div class="stats-grid" id="mainStats">
+      <div class="stat-card blue">
+        <div class="stat-icon">🚑</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">إجمالي الأسطول</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value" id="stat-ready">0</div>
+        <div class="stat-label">مركبات جاهزة</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">🔧</div>
+        <div class="stat-value" id="stat-maint">0</div>
+        <div class="stat-label">تحت الصيانة</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon">❌</div>
+        <div class="stat-value" id="stat-out">0</div>
+        <div class="stat-label">خارج الخدمة</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon">🚧</div>
+        <div class="stat-value" id="stat-accidents">0</div>
+        <div class="stat-label">حوادث مسجلة</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-value" id="stat-pending">0</div>
+        <div class="stat-label">طلبات معلقة</div>
+      </div>
+    </div>
+
+    <!-- الرسوم البيانية -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">📊 توزيع حالات الأسطول</div>
+        <canvas id="fleetStatusChart" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">📈 الصيانة الشهرية</div>
+        <canvas id="maintenanceChart" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🚧 الحوادث حسب القطاع</div>
+        <canvas id="accidentsChart" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🛢️ تغيير الزيت - الحالة</div>
+        <canvas id="oilChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- آخر الأنشطة -->
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">📋 آخر الأنشطة والعمليات</span>
+        <button class="btn btn-secondary btn-sm" onclick="showPage('reports')">عرض الكل</button>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>النوع</th>
+              <th>رقم اللوحة</th>
+              <th>القطاع</th>
+              <th>الحالة</th>
+              <th>الإنجاز</th>
+            </tr>
+          </thead>
+          <tbody id="recentActivities">
+            <tr><td colspan="6" style="color:var(--text-secondary);padding:20px">جاري تحميل البيانات...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================
+       🚑 الأسطول
+  ====================================== -->
+  <section id="page-fleet" class="page-section" style="display:none">
+    <div class="page-header">
+      <h2>🚑 شيت الأسطول (397 مركبة)</h2>
+      <div class="page-header-actions">
+        <button class="btn btn-secondary btn-sm" onclick="refreshFleet()">🔄 تحديث</button>
+        <button class="btn btn-info btn-sm" onclick="exportFleetPDF()">📄 PDF</button>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>بحث</label>
+        <input type="text" id="fleetSearch" placeholder="رقم اللوحة، النوع، الموديل..." oninput="filterFleetTable()">
+      </div>
+      <div class="filter-group">
+        <label>القطاع</label>
+        <select id="fleetSectorFilter" onchange="filterFleetTable()">
+          <option value="">الكل</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>الحالة</label>
+        <select id="fleetStatusFilter" onchange="filterFleetTable()">
+          <option value="">الكل</option>
+          <option value="جاهزة">جاهزة</option>
+          <option value="صيانة">صيانة</option>
+          <option value="خارج الخدمة">خارج الخدمة</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">🚑 قائمة المركبات</span>
+        <span id="fleetCount" style="font-size:12px;color:var(--text-secondary)">إجمالي: 0 مركبة</span>
+      </div>
+      <div class="table-responsive records-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>رقم اللوحة</th>
+              <th>النوع</th>
+              <th>الموديل</th>
+              <th>رقم الشاصي</th>
+              <th>القطاع</th>
+              <th>المركز</th>
+              <th>الحالة</th>
+              <th>آخر قراءة عداد</th>
+            </tr>
+          </thead>
+          <tbody id="fleetTableBody">
+            <tr><td colspan="9" style="color:var(--text-secondary);padding:20px">جاري تحميل بيانات الأسطول...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================
+       📍 رصد المركبات
+  ====================================== -->
+  <section id="page-tracking" class="page-section" style="display:none">
+    <div class="page-header">
+      <h2>📍 نموذج رصد المركبات</h2>
+    </div>
+
+    <div class="form-container">
+      <div class="form-title">📍 تسجيل موقع / حركة المركبة</div>
+      <form onsubmit="submitTracking(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>التاريخ <span class="required">*</span></label>
+            <input type="date" id="t_date" required>
+          </div>
+          <div class="form-group">
+            <label>الوقت <span class="required">*</span></label>
+            <input type="time" id="t_time" required>
+          </div>
+          <div class="form-group">
+            <label>اسم مدخل البيانات <span class="required">*</span></label>
+            <input type="text" id="t_user" placeholder="اسم الموظف" required>
+          </div>
+          <div class="form-group">
+            <label>رقم اللوحة <span class="required">*</span></label>
+            <select id="t_plate" onchange="fillVehicleInfo('t', this.value)" required>
+              <option value="">-- اختر المركبة --</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- بطاقة معلومات المركبة -->
+        <div class="vehicle-info-card" id="t_vehicleInfo" style="display:none">
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">النوع</span>
+            <span class="vehicle-info-value" id="t_vType">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">الموديل</span>
+            <span class="vehicle-info-value" id="t_vModel">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">رقم الشاصي</span>
+            <span class="vehicle-info-value" id="t_vChassis">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">الحالة الحالية</span>
+            <span class="vehicle-info-value" id="t_vStatus">-</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>نوع القطاع <span class="required">*</span></label>
+            <select id="t_sectorType" onchange="updateSectors('t')" required>
+              <option value="">-- اختر --</option>
+              <option value="داخلي">داخلي</option>
+              <option value="خارجي">خارجي</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>القطاع <span class="required">*</span></label>
+            <select id="t_sector" onchange="updateCenters('t')" required>
+              <option value="">-- اختر القطاع --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>المركز الإسعافي <span class="required">*</span></label>
+            <select id="t_center" required>
+              <option value="">-- اختر المركز --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>حالة المركبة <span class="required">*</span></label>
+            <select id="t_status" required>
+              <option value="عاملة">✅ عاملة</option>
+              <option value="خارج الخدمة">❌ خارج الخدمة</option>
+              <option value="صيانة">🔧 صيانة</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>ملاحظات</label>
+            <textarea id="t_notes" placeholder="أي ملاحظات إضافية..." rows="2"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">📍 إرسال بيانات الرصد</button>
+      </form>
+    </div>
+
+    <!-- سجل الرصد -->
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">📋 سجل الرصد الأخير</span>
+        <button class="btn btn-secondary btn-sm" onclick="loadTrackingRecords()">🔄 تحديث</button>
+      </div>
+      <div class="table-responsive records-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th><th>الوقت</th><th>المدخل</th>
+              <th>رقم اللوحة</th><th>نوع القطاع</th><th>القطاع</th>
+              <th>المركز</th><th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="trackingRecords">
+            <tr><td colspan="8" style="color:var(--text-secondary);padding:20px">لا توجد سجلات</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================
+       🚧 الحوادث
+  ====================================== -->
+  <section id="page-accidents" class="page-section" style="display:none">
+    <div class="page-header">
+      <h2>🚧 نموذج الحوادث</h2>
+    </div>
+
+    <div class="form-container">
+      <div class="form-title">🚧 تسجيل حادث مركبة</div>
+      <form onsubmit="submitAccident(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>التاريخ <span class="required">*</span></label>
+            <input type="date" id="a_date" required>
+          </div>
+          <div class="form-group">
+            <label>الوقت <span class="required">*</span></label>
+            <input type="time" id="a_time" required>
+          </div>
+          <div class="form-group">
+            <label>اسم مدخل البيانات <span class="required">*</span></label>
+            <input type="text" id="a_user" placeholder="اسم الموظف" required>
+          </div>
+          <div class="form-group">
+            <label>رقم اللوحة <span class="required">*</span></label>
+            <select id="a_plate" onchange="fillVehicleInfo('a', this.value)" required>
+              <option value="">-- اختر المركبة --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="vehicle-info-card" id="a_vehicleInfo" style="display:none">
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">النوع</span>
+            <span class="vehicle-info-value" id="a_vType">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">الموديل</span>
+            <span class="vehicle-info-value" id="a_vModel">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">رقم الشاصي</span>
+            <span class="vehicle-info-value" id="a_vChassis">-</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>سبب الحادث <span class="required">*</span></label>
+            <input type="text" id="a_reason" placeholder="وصف سبب الحادث" required>
+          </div>
+          <div class="form-group full-width">
+            <label>موقع الحادث <span class="required">*</span></label>
+            <input type="text" id="a_location" placeholder="الموقع التفصيلي للحادث" required>
+          </div>
+          <div class="form-group">
+            <label>حالة المركبة بعد الحادث <span class="required">*</span></label>
+            <select id="a_vehicleStatus" required>
+              <option value="عاملة">✅ عاملة</option>
+              <option value="خارج الخدمة">❌ خارج الخدمة</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>اسم القطاع <span class="required">*</span></label>
+            <input type="text" id="a_sector" placeholder="اسم القطاع" required>
+          </div>
+          <div class="form-group">
+            <label>نسبة الخطأ (%) <span class="required">*</span></label>
+            <input type="number" id="a_errorPercent" min="0" max="100" placeholder="0-100" required>
+          </div>
+          <div class="form-group">
+            <label>رقم تسجيل الحادث في أنظمة المرور</label>
+            <input type="text" id="a_reportNumber" placeholder="رقم التقرير">
+          </div>
+          <div class="form-group">
+            <label>جهة التقرير <span class="required">*</span></label>
+            <select id="a_authority" required>
+              <option value="نجم">نجم</option>
+              <option value="مرور">مرور</option>
+              <option value="شرطة">شرطة</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>حالة الإنجاز <span class="required">*</span></label>
+            <select id="a_done" required>
+              <option value="غير منجز">⏳ غير منجز</option>
+              <option value="منجز">✅ منجز</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>ملاحظات إضافية</label>
+            <textarea id="a_notes" placeholder="أي تفاصيل إضافية..." rows="2"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">🚧 تسجيل الحادث</button>
+      </form>
+    </div>
+
+    <!-- سجل الحوادث -->
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">📋 سجل الحوادث</span>
+        <div style="display:flex;gap:8px">
+          <select id="accidentFilter" onchange="filterAccidents()" style="width:auto;padding:5px 10px;font-size:12px">
+            <option value="">الكل</option>
+            <option value="منجز">منجز</option>
+            <option value="غير منجز">غير منجز</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="loadAccidentRecords()">🔄 تحديث</button>
+        </div>
+      </div>
+      <div class="table-responsive records-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th><th>الوقت</th><th>رقم اللوحة</th>
+              <th>السبب</th><th>الموقع</th><th>حالة المركبة</th>
+              <th>القطاع</th><th>نسبة الخطأ</th><th>رقم التقرير</th>
+              <th>الجهة</th><th>الإنجاز</th>
+            </tr>
+          </thead>
+          <tbody id="accidentRecords">
+            <tr><td colspan="11" style="color:var(--text-secondary);padding:20px">لا توجد سجلات</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================
+       🔧 الصيانة الوقائية
+  ====================================== -->
+  <section id="page-maintenance" class="page-section" style="display:none">
+    <div class="page-header">
+      <h2>🔧 نموذج الصيانة الوقائية الدورية</h2>
+    </div>
+
+    <div class="form-container">
+      <div class="form-title">🔧 كرت الصيانة</div>
+      <form onsubmit="submitMaintenance(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>تاريخ الدخول للصيانة <span class="required">*</span></label>
+            <input type="date" id="m_dateIn" required>
+          </div>
+          <div class="form-group">
+            <label>وقت الدخول <span class="required">*</span></label>
+            <input type="time" id="m_timeIn" required>
+          </div>
+          <div class="form-group">
+            <label>تاريخ الخروج من الصيانة</label>
+            <input type="date" id="m_dateOut">
+          </div>
+          <div class="form-group">
+            <label>وقت الخروج</label>
+            <input type="time" id="m_timeOut">
+          </div>
+          <div class="form-group">
+            <label>اسم مدخل البيانات <span class="required">*</span></label>
+            <input type="text" id="m_user" placeholder="اسم الموظف" required>
+          </div>
+          <div class="form-group">
+            <label>رقم اللوحة <span class="required">*</span></label>
+            <select id="m_plate" onchange="fillVehicleInfo('m', this.value)" required>
+              <option value="">-- اختر المركبة --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="vehicle-info-card" id="m_vehicleInfo" style="display:none">
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">النوع</span>
+            <span class="vehicle-info-value" id="m_vType">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">الموديل</span>
+            <span class="vehicle-info-value" id="m_vModel">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">رقم الشاصي</span>
+            <span class="vehicle-info-value" id="m_vChassis">-</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>نوع العطل <span class="required">*</span></label>
+            <select id="m_faultType" required>
+              <option value="">-- اختر --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>وصف العطل <span class="required">*</span></label>
+            <select id="m_faultDesc" required>
+              <option value="">-- اختر --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>درجة العطل <span class="required">*</span></label>
+            <select id="m_severity" required>
+              <option value="خفيف">🟢 خفيف</option>
+              <option value="متوسط">🟡 متوسط</option>
+              <option value="ثقيل">🔴 ثقيل</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>اسم الفني المختص <span class="required">*</span></label>
+            <select id="m_tech" required>
+              <option value="">-- اختر الفني --</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>قطع الغيار المطلوبة</label>
+            <textarea id="m_parts" placeholder="اذكر قطع الغيار المطلوبة..." rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>هل تحتاج ورشة خارجية؟</label>
+            <select id="m_external" onchange="toggleWorkshop()">
+              <option value="لا">لا</option>
+              <option value="نعم">نعم</option>
+            </select>
+          </div>
+          <div class="form-group" id="workshopGroup" style="display:none">
+            <label>اسم الورشة الخارجية</label>
+            <input type="text" id="m_workshop" placeholder="اسم الورشة">
+          </div>
+          <div class="form-group">
+            <label>حالة الإنجاز <span class="required">*</span></label>
+            <select id="m_status" required>
+              <option value="غير منجز">⏳ غير منجز</option>
+              <option value="منجز">✅ منجز</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>ملاحظات</label>
+            <textarea id="m_notes" placeholder="ملاحظات إضافية..." rows="2"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">🔧 حفظ كرت الصيانة</button>
+      </form>
+    </div>
+
+    <!-- سجل الصيانة -->
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">📋 سجل الصيانة</span>
+        <div style="display:flex;gap:8px">
+          <select id="maintFilter" onchange="filterMaintenance()" style="width:auto;padding:5px 10px;font-size:12px">
+            <option value="">الكل</option>
+            <option value="منجز">منجز</option>
+            <option value="غير منجز">غير منجز</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="loadMaintenanceRecords()">🔄 تحديث</button>
+        </div>
+      </div>
+      <div class="table-responsive records-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>تاريخ الدخول</th><th>تاريخ الخروج</th><th>رقم اللوحة</th>
+              <th>النوع</th><th>الموديل</th><th>نوع العطل</th>
+              <th>الدرجة</th><th>الفني</th><th>قطع الغيار</th>
+              <th>ورشة خارجية</th><th>الإنجاز</th>
+            </tr>
+          </thead>
+          <tbody id="maintenanceRecords">
+            <tr><td colspan="11" style="color:var(--text-secondary);padding:20px">لا توجد سجلات</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================
+       🛢️ تغيير الزيت
+  ====================================== -->
+  <section id="page-oil" class="page-section" style="display:none">
+    <div class="page-header">
+      <h2>🛢️ نموذج تغيير الزيت</h2>
+    </div>
+
+    <!-- تنبيهات الزيت -->
+    <div id="oilAlertsContainer" class="alerts-container"></div>
+
+    <div class="form-container">
+      <div class="form-title">🛢️ تسجيل تغيير الزيت</div>
+      <form onsubmit="submitOil(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>التاريخ <span class="required">*</span></label>
+            <input type="date" id="o_date" required>
+          </div>
+          <div class="form-group">
+            <label>الوقت <span class="required">*</span></label>
+            <input type="time" id="o_time" required>
+          </div>
+          <div class="form-group">
+            <label>اسم مدخل البيانات <span class="required">*</span></label>
+            <input type="text" id="o_user" placeholder="اسم الموظف" required>
+          </div>
+          <div class="form-group">
+            <label>رقم اللوحة <span class="required">*</span></label>
+            <select id="o_plate" onchange="fillOilData(this.value)" required>
+              <option value="">-- اختر المركبة --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="vehicle-info-card" id="o_vehicleInfo" style="display:none">
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">النوع</span>
+            <span class="vehicle-info-value" id="o_vType">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">الموديل</span>
+            <span class="vehicle-info-value" id="o_vModel">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">آخر تغيير زيت</span>
+            <span class="vehicle-info-value" id="o_lastChange">-</span>
+          </div>
+          <div class="vehicle-info-item">
+            <span class="vehicle-info-label">آخر قراءة عداد</span>
+            <span class="vehicle-info-value" id="o_lastKmDisplay">-</span>
+          </div>
+        </div>
+
+        <!-- مؤشر الزيت -->
+        <div id="oilIndicator" style="display:none;margin-bottom:15px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+            <span id="oilIndicatorText">حالة الزيت</span>
+            <span id="oilIndicatorPct">0%</span>
+          </div>
+          <div class="oil-progress">
+            <div class="oil-progress-bar safe" id="oilProgressBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>رقم الطلب <span class="required">*</span></label>
+            <input type="text" id="o_orderNum" placeholder="رقم طلب الزيت" required>
+          </div>
+          <div class="form-group">
+            <label>قراءة العداد الحالية (كم) <span class="required">*</span></label>
+            <input type="number" id="o_km" placeholder="أدخل قراءة العداد" required oninput="calcOilDiff()">
+          </div>
+          <div class="form-group">
+            <label>آخر قراءة للعداد (كم)</label>
+            <input type="number" id="o_lastKm" placeholder="تلقائي من السجل" readonly style="background:rgba(26,122,60,0.05)">
+          </div>
+          <div class="form-group">
+            <label>الفرق (كم)</label>
+            <input type="number" id="o_diff" placeholder="يحسب تلقائياً" readonly style="background:rgba(26,122,60,0.05)">
+          </div>
+          <div class="form-group full-width">
+            <label>ملاحظات</label>
+            <textarea id="o_notes" placeholder="ملاحظات إضافية..." rows="2"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">🛢️ تسجيل تغيير الزيت</button>
+      </form>
+    </div>
+
+    <!-- سجل تغيير الزيت -->
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">📋 سجل تغيير الزيت</span>
+        <button class="btn btn-secondary btn-sm" onclick="loadOilRecords()">🔄 تحديث</button>
+      </div>
+      <div class="table-responsive records-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th><th>الوقت</th><th>رقم اللوحة</th>
+              <th>النوع</th><th>الموديل</th><th>رقم الطلب</th>
+              <th>قراءة العداد</th><th>آخر قراءة</th><th>الفرق (كم)</th>
+              <th>حالة الزيت</th>
+            </tr>
+          </thead>
+          <tbody id="oilRecords">
+            <tr><td colspan="10" style="color:var(--text-secondary);padding:20px">لا توجد سجلات</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================
+       📈 التقارير
+  ====================================== -->
+  <section id="page-reports" class="page-section" style="display:none">
+    <div class="page-header">
+      <h2>📈 التقارير والإحصائيات</h2>
+      <div class="page-header-actions">
+        <button class="btn btn-danger btn-sm" onclick="exportFullReportPDF()">📄 تصدير PDF</button>
+      </div>
+    </div>
+
+    <!-- تبويبات التقارير -->
+    <div class="report-tabs">
+      <button class="report-tab active" onclick="switchReport('monthly', this)">📅 شهري</button>
+      <button class="report-tab" onclick="switchReport('quarterly', this)">📊 ربع سنوي</button>
+      <button class="report-tab" onclick="switchReport('annual', this)">📆 سنوي</button>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>السنة</label>
+        <select id="rpt_year"></select>
+      </div>
+      <div class="filter-group" id="rpt_monthGroup">
+        <label>الشهر</label>
+        <select id="rpt_month">
+          <option value="1">يناير</option><option value="2">فبراير</option>
+          <option value="3">مارس</option><option value="4">أبريل</option>
+          <option value="5">مايو</option><option value="6">يونيو</option>
+          <option value="7">يوليو</option><option value="8">أغسطس</option>
+          <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
+          <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+        </select>
+      </div>
+      <div class="filter-group" id="rpt_quarterGroup" style="display:none">
+        <label>الربع</label>
+        <select id="rpt_quarter">
+          <option value="1">الربع الأول</option>
+          <option value="2">الربع الثاني</option>
+          <option value="3">الربع الثالث</option>
+          <option value="4">الربع الرابع</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="generateReport()">📊 إنشاء التقرير</button>
+      </div>
+    </div>
+
+    <!-- ملخص التقرير -->
+    <div id="reportSummary" style="display:none">
+      <div class="stats-grid" id="reportStats"></div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">📊 الصيانة</div>
+          <canvas id="rptMaintChart" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">🚧 الحوادث</div>
+          <canvas id="rptAccChart" height="200"></canvas>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">
+          <span class="table-title" id="reportTableTitle">📋 تفاصيل التقرير</span>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead id="reportTableHead"></thead>
+            <tbody id="reportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ====== الشريط السفلي ====== -->
+<footer class="footer">
+  <span>👤 قائد الأسطول: ثامر عياد الحربي</span>
+  <span>💻 تطوير: علي 102459@srca</span>
+  <span>© تشغيل وصيانة الأسطول - منطقة الرياض</span>
+</footer>
+
+<!-- ====== مؤشر التحميل ====== -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loadingText">جاري تحميل بيانات الأسطول...</div>
+</div>
+
+<!-- ====== إشعار ====== -->
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
