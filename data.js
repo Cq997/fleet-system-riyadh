@@ -91,8 +91,7 @@ const FLEET_SAMPLE = [
 
 // ====== إعدادات Google Sheets ======
 const CONFIG = {
-  // يجب تحديث هذا الرابط بعد نشر Google Apps Script
-  SCRIPT_URL: "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE",
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyDFRlRvIi_uRMZvcTF365ncbQ4AVFU0iD9kNMmbRMhZZ_TSPNDVCAlpWZ_uOLQCgs/exec",
   SHEET_NAMES: {
     FLEET: "الأسطول",
     TRACKING: "الرصد",
