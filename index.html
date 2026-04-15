@@ -891,6 +891,35 @@
 <!-- ====== إشعار ====== -->
 <div class="toast" id="toast"></div>
 
+<!-- ====== نافذة إعداد Google Sheets ====== -->
+<div class="settings-overlay" id="settingsOverlay" style="display:none">
+  <div class="settings-modal">
+    <div class="settings-header">
+      <div class="settings-icon">⚙️</div>
+      <h2>ربط Google Sheets</h2>
+      <p>أدخل رابط Google Apps Script لتفعيل حفظ البيانات</p>
+    </div>
+    <div class="settings-body">
+      <label>رابط Web App URL</label>
+      <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/..." />
+      <div class="settings-hint">
+        <strong>كيفية الحصول على الرابط:</strong><br>
+        1. افتح Google Sheets ← الإضافات ← Apps Script<br>
+        2. الصق الكود من ملف google-apps-script.js<br>
+        3. نشر ← نشر كتطبيق ويب ← انسخ الرابط<br>
+        4. الصق الرابط هنا واضغط حفظ
+      </div>
+    </div>
+    <div class="settings-footer">
+      <button class="btn-save-script" onclick="saveScriptUrl()">💾 حفظ وتفعيل</button>
+      <button class="btn-skip-script" onclick="skipScriptSetup()">تخطي (وضع تجريبي)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== زر الإعدادات الدائم ====== -->
+<button class="settings-fab" id="settingsFab" onclick="openSettings()" title="إعدادات الربط">⚙️</button>
+
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>

@@ -900,3 +900,135 @@ tbody td {
   background: var(--srca-green);
   transition: width 0.5s ease;
 }
+
+/* ====== نافذة إعداد Google Sheets ====== */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.82);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.settings-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+.settings-header {
+  background: linear-gradient(135deg, var(--srca-green-dark) 0%, var(--srca-green) 100%);
+  padding: 2rem;
+  text-align: center;
+  color: #fff;
+}
+.settings-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.settings-header h2 { margin: 0 0 0.5rem; font-size: 1.4rem; font-weight: 800; }
+.settings-header p  { margin: 0; opacity: 0.85; font-size: 0.88rem; }
+.settings-body { padding: 1.5rem 2rem; }
+.settings-body label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+.settings-body input[type="url"] {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: var(--bg-dark);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.82rem;
+  direction: ltr;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.settings-body input[type="url"]:focus {
+  outline: none;
+  border-color: var(--srca-green);
+  box-shadow: 0 0 0 3px rgba(26,122,60,0.2);
+}
+.settings-hint {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(26,122,60,0.08);
+  border-right: 3px solid var(--srca-green);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 2;
+}
+.settings-footer {
+  padding: 1rem 2rem 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.btn-save-script {
+  flex: 1;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, var(--srca-green), var(--srca-green-light));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(26,122,60,0.3);
+}
+.btn-save-script:hover {
+  background: linear-gradient(135deg, var(--srca-green-dark), var(--srca-green));
+  transform: translateY(-1px);
+}
+.btn-skip-script {
+  padding: 0.8rem 1.2rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-skip-script:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+/* زر الإعدادات العائم */
+.settings-fab {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  width: 46px;
+  height: 46px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+.settings-fab:hover {
+  background: var(--srca-green);
+  border-color: var(--srca-green);
+  color: #fff;
+  transform: rotate(45deg);
+}

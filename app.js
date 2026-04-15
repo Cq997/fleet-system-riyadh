@@ -16,16 +16,60 @@ let charts = {};          // مخزن الرسوم البيانية
 let currentReport = 'monthly';
 
 // ====== رابط Google Apps Script ======
-// يجب تحديث هذا الرابط بعد نشر السكريبت
-const SCRIPT_URL = typeof CONFIG !== 'undefined' ? CONFIG.SCRIPT_URL : 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+// يتم حفظه في localStorage بشكل دائم
+function getScriptUrl() {
+  return localStorage.getItem('srca_script_url') || '';
+}
+
+function isScriptConnected() {
+  var url = getScriptUrl();
+  return url && url.startsWith('https://script.google.com');
+}
 
 // ====== تهيئة التطبيق ======
 window.addEventListener('DOMContentLoaded', () => {
   initYearSelects();
   setDefaultDates();
   fillFormDropdowns();
-  loadAllData();
+
+  // إظهار نافذة الإعداد إذا لم يتم الربط بعد
+  if (!isScriptConnected()) {
+    var overlay = document.getElementById('settingsOverlay');
+    if (overlay) overlay.style.display = 'flex';
+  } else {
+    loadAllData();
+  }
 });
+
+// ====== دوال نافذة الإعداد ======
+function openSettings() {
+  var overlay = document.getElementById('settingsOverlay');
+  var input   = document.getElementById('scriptUrlInput');
+  if (overlay) overlay.style.display = 'flex';
+  if (input)   input.value = getScriptUrl();
+}
+
+function saveScriptUrl() {
+  var input = document.getElementById('scriptUrlInput');
+  var url   = (input ? input.value : '').trim();
+
+  if (!url || !url.startsWith('https://script.google.com')) {
+    showToast('⚠️ الرابط غير صحيح. يجب أن يبدأ بـ https://script.google.com', 'error');
+    return;
+  }
+
+  localStorage.setItem('srca_script_url', url);
+  var overlay = document.getElementById('settingsOverlay');
+  if (overlay) overlay.style.display = 'none';
+  showToast('✅ تم حفظ الرابط بنجاح! جاري تحميل البيانات...');
+  loadAllData();
+}
+
+function skipScriptSetup() {
+  var overlay = document.getElementById('settingsOverlay');
+  if (overlay) overlay.style.display = 'none';
+  loadDemoData();
+}
 
 // ====== تهيئة قوائم السنوات ======
 function initYearSelects() {
@@ -94,7 +138,7 @@ function fillFormDropdowns() {
 async function loadAllData() {
   showLoading('جاري تحميل بيانات الأسطول...');
   try {
-    const url = SCRIPT_URL + '?action=getAll';
+    const url = getScriptUrl() + '?action=getAll';
     const res = await fetch(url);
     if (!res.ok) throw new Error('فشل الاتصال');
     const data = await res.json();
@@ -968,13 +1012,14 @@ async function submitOil(e) {
 
 // ====== إرسال البيانات إلى Google Sheets ======
 async function sendToSheets(data) {
-  if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+  if (!isScriptConnected()) {
     console.log('Google Sheets غير مربوط - البيانات محفوظة محلياً:', data);
+    showToast('⚠️ اضغط على ⚙️ لربط Google Sheets وحفظ البيانات', 'error');
     return;
   }
 
   try {
-    await fetch(SCRIPT_URL, {
+    await fetch(getScriptUrl(), {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
