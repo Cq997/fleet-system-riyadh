@@ -1,274 +1,287 @@
 // ============================================================
-// Google Apps Script
-// Fleet Maintenance Platform - SRCA Riyadh Region
-// Developer: Ali 102459@srca.org.sa
-// Supervisor: Thamer Ayyad Al-Harbi
+// Google Apps Script - Fleet Management System
+// Saudi Red Crescent Authority - Riyadh Region
+// Version: 4.0 - Arabic Sheets
+// ============================================================
+// HOW TO USE:
+// 1. Open Google Sheets
+// 2. Extensions > Apps Script
+// 3. Delete all code, paste this file
+// 4. Save (Ctrl+S)
+// 5. Run: setupSheets()
+// 6. Deploy > New deployment > Web App
+//    Execute as: Me | Access: Anyone
+// 7. Copy Web App URL to platform settings
 // ============================================================
 
-var SHEET_FLEET       = 'Fleet';
-var SHEET_TRACKING    = 'Tracking';
-var SHEET_ACCIDENTS   = 'Accidents';
-var SHEET_MAINTENANCE = 'Maintenance';
-var SHEET_OIL         = 'OilChange';
+var SHEETS = {
+  fleet:       "\u0627\u0644\u0623\u0633\u0637\u0648\u0644",
+  tracking:    "\u0631\u0635\u062f \u0627\u0644\u0645\u0631\u0643\u0628\u0627\u062a",
+  accidents:   "\u0627\u0644\u062d\u0648\u0627\u062f\u062b",
+  maintenance: "\u0627\u0644\u0635\u064a\u0627\u0646\u0629 \u0627\u0644\u0648\u0642\u0627\u0626\u064a\u0629",
+  oil:         "\u062a\u063a\u064a\u064a\u0631 \u0627\u0644\u0632\u064a\u062a"
+};
 
-var HEADERS_FLEET = [
-  'plate', 'type', 'model', 'chassis',
-  'sectorType', 'sector', 'center', 'status',
-  'lastKm', 'notes'
+var HEADERS = {};
+
+HEADERS.fleet = [
+  "\u0631\u0642\u0645_\u0627\u0644\u0644\u0648\u062d\u0629",
+  "\u0627\u0644\u0646\u0648\u0639",
+  "\u0627\u0644\u0645\u0648\u062f\u064a\u0644",
+  "\u0631\u0642\u0645_\u0627\u0644\u0634\u0627\u0635\u064a",
+  "\u0627\u0644\u0642\u0637\u0627\u0639",
+  "\u0627\u0644\u0645\u0631\u0643\u0632",
+  "\u0627\u0644\u062d\u0627\u0644\u0629",
+  "\u0622\u062e\u0631_\u0642\u0631\u0627\u0621\u0629_\u0639\u062f\u0627\u062f",
+  "\u062a\u0627\u0631\u064a\u062e_\u0622\u062e\u0631_\u062a\u063a\u064a\u064a\u0631_\u0632\u064a\u062a",
+  "\u0642\u0631\u0627\u0621\u0629_\u0639\u062f\u0627\u062f_\u0622\u062e\u0631_\u062a\u063a\u064a\u064a\u0631_\u0632\u064a\u062a",
+  "\u0645\u0644\u0627\u062d\u0638\u0627\u062a"
 ];
 
-var HEADERS_TRACKING = [
-  'date', 'time', 'user', 'plate',
-  'sectorType', 'sector', 'center', 'status', 'notes'
+HEADERS.tracking = [
+  "\u0631\u0642\u0645_\u0627\u0644\u0637\u0644\u0628",
+  "\u0627\u0644\u062a\u0627\u0631\u064a\u062e",
+  "\u0627\u0644\u0648\u0642\u062a",
+  "\u0631\u0642\u0645_\u0627\u0644\u0644\u0648\u062d\u0629",
+  "\u0627\u0644\u0646\u0648\u0639",
+  "\u0627\u0644\u0642\u0637\u0627\u0639",
+  "\u0627\u0644\u0645\u0631\u0643\u0632",
+  "\u0627\u0644\u0645\u0648\u0642\u0639",
+  "\u0627\u0644\u062d\u0627\u0644\u0629",
+  "\u0642\u0631\u0627\u0621\u0629_\u0627\u0644\u0639\u062f\u0627\u062f",
+  "\u0645\u0644\u0627\u062d\u0638\u0627\u062a",
+  "\u062d\u0627\u0644\u0629_\u0627\u0644\u0625\u0646\u062c\u0627\u0632",
+  "\u0648\u0642\u062a_\u0627\u0644\u0625\u062f\u062e\u0627\u0644"
 ];
 
-var HEADERS_ACCIDENTS = [
-  'date', 'time', 'user', 'plate',
-  'cause', 'location', 'vehicleStatus', 'sector',
-  'faultPercent', 'reportNum', 'reportAuthority',
-  'completionStatus', 'notes'
+HEADERS.accidents = [
+  "\u0631\u0642\u0645_\u0627\u0644\u0637\u0644\u0628",
+  "\u0627\u0644\u062a\u0627\u0631\u064a\u062e",
+  "\u0627\u0644\u0648\u0642\u062a",
+  "\u0631\u0642\u0645_\u0627\u0644\u0644\u0648\u062d\u0629",
+  "\u0627\u0644\u0646\u0648\u0639",
+  "\u0627\u0644\u0642\u0637\u0627\u0639",
+  "\u0627\u0644\u0645\u0631\u0643\u0632",
+  "\u0646\u0648\u0639_\u0627\u0644\u062d\u0627\u062f\u062b",
+  "\u0648\u0635\u0641_\u0627\u0644\u062d\u0627\u062f\u062b",
+  "\u0627\u0644\u0623\u0636\u0631\u0627\u0631",
+  "\u0627\u0644\u062d\u0627\u0644\u0629",
+  "\u062d\u0627\u0644\u0629_\u0627\u0644\u0625\u0646\u062c\u0627\u0632",
+  "\u062a\u0627\u0631\u064a\u062e_\u0627\u0644\u062a\u062d\u062f\u064a\u062b",
+  "\u0648\u0642\u062a_\u0627\u0644\u0625\u062f\u062e\u0627\u0644"
 ];
 
-var HEADERS_MAINTENANCE = [
-  'entryDate', 'entryTime', 'exitDate', 'exitTime',
-  'faultType', 'plate', 'type', 'model', 'chassis',
-  'user', 'faultLevel', 'techName', 'spareParts',
-  'externalWorkshop', 'workshopName', 'completionStatus',
-  'notes', 'faultDesc'
+HEADERS.maintenance = [
+  "\u0631\u0642\u0645_\u0627\u0644\u0637\u0644\u0628",
+  "\u0627\u0644\u062a\u0627\u0631\u064a\u062e",
+  "\u0631\u0642\u0645_\u0627\u0644\u0644\u0648\u062d\u0629",
+  "\u0627\u0644\u0646\u0648\u0639",
+  "\u0627\u0644\u0645\u0648\u062f\u064a\u0644",
+  "\u0627\u0644\u0642\u0637\u0627\u0639",
+  "\u0627\u0644\u0645\u0631\u0643\u0632",
+  "\u0646\u0648\u0639_\u0627\u0644\u0639\u0637\u0644",
+  "\u0648\u0635\u0641_\u0627\u0644\u0639\u0637\u0644",
+  "\u0642\u0637\u0639_\u0627\u0644\u063a\u064a\u0627\u0631",
+  "\u0627\u0644\u0641\u0646\u064a_\u0627\u0644\u0645\u0633\u0624\u0648\u0644",
+  "\u0642\u0631\u0627\u0621\u0629_\u0627\u0644\u0639\u062f\u0627\u062f",
+  "\u0627\u0644\u062a\u0643\u0644\u0641\u0629_\u0627\u0644\u062a\u0642\u062f\u064a\u0631\u064a\u0629",
+  "\u062d\u0627\u0644\u0629_\u0627\u0644\u0625\u0646\u062c\u0627\u0632",
+  "\u062a\u0627\u0631\u064a\u062e_\u0627\u0644\u0625\u0646\u062c\u0627\u0632",
+  "\u0648\u0642\u062a_\u0627\u0644\u0625\u062f\u062e\u0627\u0644"
 ];
 
-var HEADERS_OIL = [
-  'date', 'time', 'user', 'plate',
-  'orderNum', 'currentKm', 'lastKm',
-  'diff', 'notes', 'type', 'model'
+HEADERS.oil = [
+  "\u0631\u0642\u0645_\u0627\u0644\u0637\u0644\u0628",
+  "\u0627\u0644\u062a\u0627\u0631\u064a\u062e",
+  "\u0631\u0642\u0645_\u0627\u0644\u0644\u0648\u062d\u0629",
+  "\u0627\u0644\u0646\u0648\u0639",
+  "\u0627\u0644\u0645\u0648\u062f\u064a\u0644",
+  "\u0627\u0644\u0642\u0637\u0627\u0639",
+  "\u0627\u0644\u0645\u0631\u0643\u0632",
+  "\u0642\u0631\u0627\u0621\u0629_\u0627\u0644\u0639\u062f\u0627\u062f",
+  "\u0646\u0648\u0639_\u0627\u0644\u0632\u064a\u062a",
+  "\u0627\u0644\u0641\u0646\u064a_\u0627\u0644\u0645\u0633\u0624\u0648\u0644",
+  "\u0627\u0644\u0645\u0648\u0639\u062f_\u0627\u0644\u0642\u0627\u062f\u0645_\u0643\u0645",
+  "\u0627\u0644\u0645\u0648\u0639\u062f_\u0627\u0644\u0642\u0627\u062f\u0645_\u062a\u0627\u0631\u064a\u062e",
+  "\u0645\u0644\u0627\u062d\u0638\u0627\u062a",
+  "\u062d\u0627\u0644\u0629_\u0627\u0644\u0625\u0646\u062c\u0627\u0632",
+  "\u0648\u0642\u062a_\u0627\u0644\u0625\u062f\u062e\u0627\u0644"
 ];
 
 // ============================================================
-// setupSheets - Run this once to create all sheets
+// doGet - Main Web App Entry Point
+// ============================================================
+function doGet(e) {
+  var params = e.parameter;
+  var action = params.action || "get";
+  var callback = params.callback || "";
+  var result;
+
+  try {
+    if (action === "get") {
+      var sName = params.sheet || SHEETS.fleet;
+      result = getSheetData(sName);
+    } else if (action === "add") {
+      var sName2 = params.sheet || SHEETS.fleet;
+      var dataStr = params.data || "{}";
+      var dataObj = JSON.parse(dataStr);
+      result = addRow(sName2, dataObj);
+    } else if (action === "getAll") {
+      result = getAllData();
+    } else if (action === "setup") {
+      setupSheets();
+      result = { status: "success", message: "Setup complete" };
+    } else {
+      result = { status: "error", message: "Unknown action" };
+    }
+  } catch (err) {
+    result = { status: "error", message: err.toString() };
+  }
+
+  var jsonStr = JSON.stringify(result);
+  if (callback) {
+    return ContentService.createTextOutput(callback + "(" + jsonStr + ")")
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(jsonStr)
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ============================================================
+// Get All Data from All Sheets
+// ============================================================
+function getAllData() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var result = {};
+  var keys = ["fleet", "tracking", "accidents", "maintenance", "oil"];
+
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
+    var sheet = ss.getSheetByName(SHEETS[k]);
+    if (sheet && sheet.getLastRow() > 1) {
+      var data = sheet.getDataRange().getValues();
+      var headers = data[0];
+      var rows = [];
+      for (var r = 1; r < data.length; r++) {
+        var rowObj = {};
+        for (var c = 0; c < headers.length; c++) {
+          rowObj[headers[c]] = data[r][c];
+        }
+        rows.push(rowObj);
+      }
+      result[k] = rows;
+    } else {
+      result[k] = [];
+    }
+  }
+
+  result.status = "success";
+  result.timestamp = new Date().toISOString();
+  return result;
+}
+
+// ============================================================
+// Get Data from One Sheet
+// ============================================================
+function getSheetData(sheetName) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    return { status: "error", message: "Sheet not found", data: [] };
+  }
+  if (sheet.getLastRow() <= 1) {
+    return { status: "success", data: [], count: 0 };
+  }
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var rows = [];
+  for (var r = 1; r < data.length; r++) {
+    var rowObj = {};
+    for (var c = 0; c < headers.length; c++) {
+      rowObj[headers[c]] = data[r][c];
+    }
+    rows.push(rowObj);
+  }
+  return { status: "success", data: rows, count: rows.length };
+}
+
+// ============================================================
+// Add Row to Sheet
+// ============================================================
+function addRow(sheetName, dataObj) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+  }
+  var lastCol = sheet.getLastColumn();
+  if (lastCol === 0) {
+    return { status: "error", message: "Sheet has no headers" };
+  }
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var row = [];
+  for (var i = 0; i < headers.length; i++) {
+    var h = headers[i];
+    row.push(dataObj[h] !== undefined ? dataObj[h] : "");
+  }
+  sheet.appendRow(row);
+  return { status: "success", message: "Row added", sheet: sheetName };
+}
+
+// ============================================================
+// Setup All Sheets - Run Once
 // ============================================================
 function setupSheets() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-
-  createSheet(ss, SHEET_FLEET,       HEADERS_FLEET);
-  createSheet(ss, SHEET_TRACKING,    HEADERS_TRACKING);
-  createSheet(ss, SHEET_ACCIDENTS,   HEADERS_ACCIDENTS);
-  createSheet(ss, SHEET_MAINTENANCE, HEADERS_MAINTENANCE);
-  createSheet(ss, SHEET_OIL,         HEADERS_OIL);
-
-  var fleetSheet = ss.getSheetByName(SHEET_FLEET);
-  if (fleetSheet && fleetSheet.getLastRow() <= 1) {
-    addSampleFleetData(fleetSheet);
+  var colors = {
+    fleet:       "#1a472a",
+    tracking:    "#1a3a5c",
+    accidents:   "#7b1a1a",
+    maintenance: "#4a3500",
+    oil:         "#1a4a4a"
+  };
+  var keys = ["fleet", "tracking", "accidents", "maintenance", "oil"];
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
+    buildSheet(ss, SHEETS[k], HEADERS[k], colors[k]);
   }
-
-  SpreadsheetApp.getUi().alert('All sheets created successfully.');
+  try {
+    SpreadsheetApp.getUi().alert("Done! All 5 sheets created successfully.");
+  } catch (e2) {
+    Logger.log("Setup complete - all sheets created");
+  }
 }
 
-function createSheet(ss, name, headers) {
+function buildSheet(ss, name, headers, color) {
   var sheet = ss.getSheetByName(name);
   if (!sheet) {
     sheet = ss.insertSheet(name);
   }
-  if (sheet.getLastRow() === 0) {
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    var hRange = sheet.getRange(1, 1, 1, headers.length);
-    hRange.setBackground('#1a7a3c');
-    hRange.setFontColor('#ffffff');
-    hRange.setFontWeight('bold');
-    hRange.setHorizontalAlignment('center');
-    sheet.setFrozenRows(1);
-    sheet.setColumnWidths(1, headers.length, 150);
+  sheet.clearContents();
+  var r = sheet.getRange(1, 1, 1, headers.length);
+  r.setValues([headers]);
+  r.setBackground(color || "#1a472a");
+  r.setFontColor("#ffffff");
+  r.setFontWeight("bold");
+  r.setHorizontalAlignment("center");
+  sheet.setFrozenRows(1);
+  sheet.setRightToLeft(true);
+  for (var i = 1; i <= headers.length; i++) {
+    sheet.setColumnWidth(i, 160);
   }
   return sheet;
 }
 
 // ============================================================
-// Add 397 sample vehicles
-// ============================================================
-function addSampleFleetData(sheet) {
-  var types   = ['Toyota Hilux', 'Toyota Land Cruiser', 'Ford F150', 'Nissan Patrol', 'Mitsubishi L200'];
-  var models  = ['2020', '2021', '2022', '2023', '2024'];
-  var letters = ['A B', 'C D', 'E F', 'G H', 'I J'];
-  var sectors = [
-    ['Internal', 'Central Riyadh',    'Al-Malaz'],
-    ['Internal', 'North Riyadh',      'Al-Malaqa'],
-    ['Internal', 'South Riyadh',      'Al-Hair'],
-    ['Internal', 'East Riyadh',       'Al-Naseem'],
-    ['Internal', 'West Riyadh',       'Al-Suwaidi'],
-    ['External', 'Kharj Governorate', 'Al-Kharj'],
-    ['External', 'Diriyah',           'Diriyah']
-  ];
-  var statuses = ['Active', 'Active', 'Active', 'Active', 'Maintenance', 'Out of Service'];
-
-  var rows = [];
-  for (var i = 1; i <= 397; i++) {
-    var plateNum = 1000 + i;
-    var plate    = plateNum + ' ' + letters[i % letters.length];
-    var type     = types[i % types.length];
-    var model    = models[i % models.length];
-    var chassis  = 'SA' + padLeft(String(i), 15, '0');
-    var sector   = sectors[i % sectors.length];
-    var status   = statuses[i % statuses.length];
-    var lastKm   = 10000 + (i * 500);
-    rows.push([plate, type, model, chassis, sector[0], sector[1], sector[2], status, lastKm, '']);
-  }
-
-  if (rows.length > 0) {
-    sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
-  }
-}
-
-function padLeft(str, len, ch) {
-  while (str.length < len) { str = ch + str; }
-  return str;
-}
-
-// ============================================================
-// doGet - Read data (HTTP GET)
-// ============================================================
-function doGet(e) {
-  var action = e.parameter.action || 'getAll';
-  try {
-    if (action === 'getAll')         return getAllData();
-    if (action === 'setup')          { setupSheets(); return jsonOk('Setup complete'); }
-    if (action === 'getFleet')       return getSheetData(SHEET_FLEET);
-    if (action === 'getTracking')    return getSheetData(SHEET_TRACKING);
-    if (action === 'getAccidents')   return getSheetData(SHEET_ACCIDENTS);
-    if (action === 'getMaintenance') return getSheetData(SHEET_MAINTENANCE);
-    if (action === 'getOil')         return getSheetData(SHEET_OIL);
-    return jsonResponse({ error: 'Unknown action: ' + action });
-  } catch (err) {
-    return jsonResponse({ error: err.message });
-  }
-}
-
-function getAllData() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  return jsonResponse({
-    fleet:       getSheetValues(ss, SHEET_FLEET),
-    tracking:    getSheetValues(ss, SHEET_TRACKING),
-    accidents:   getSheetValues(ss, SHEET_ACCIDENTS),
-    maintenance: getSheetValues(ss, SHEET_MAINTENANCE),
-    oil:         getSheetValues(ss, SHEET_OIL),
-    timestamp:   new Date().toISOString()
-  });
-}
-
-function getSheetValues(ss, sheetName) {
-  var sheet = ss.getSheetByName(sheetName);
-  if (!sheet || sheet.getLastRow() <= 1) return [];
-  var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
-  var result = [];
-  for (var i = 0; i < data.length; i++) {
-    if (data[i][0] !== '') result.push(data[i]);
-  }
-  return result;
-}
-
-function getSheetData(sheetName) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  return jsonResponse({ rows: getSheetValues(ss, sheetName) });
-}
-
-// ============================================================
-// doPost - Write data (HTTP POST)
-// ============================================================
-function doPost(e) {
-  try {
-    var body      = JSON.parse(e.postData.contents);
-    var sheetName = body.sheet;
-    var values    = body.values;
-    var action    = body.action;
-
-    if (action === 'updateFleetStatus') {
-      updateFleetStatus(body.plate, body.status, body.km);
-      return jsonOk('Status updated');
-    }
-
-    if (!sheetName || !values) {
-      return jsonResponse({ success: false, error: 'Missing sheet or values' });
-    }
-
-    var ss          = SpreadsheetApp.getActiveSpreadsheet();
-    var targetSheet = ss.getSheetByName(sheetName);
-    if (!targetSheet) targetSheet = ss.insertSheet(sheetName);
-
-    targetSheet.appendRow(values);
-
-    // Auto-update fleet status
-    if (sheetName === SHEET_TRACKING) {
-      updateFleetStatus(values[3], values[7], null);
-
-    } else if (sheetName === SHEET_MAINTENANCE) {
-      var mStatus = (values[15] === 'Completed') ? 'Active' : 'Maintenance';
-      updateFleetStatus(values[5], mStatus, null);
-
-    } else if (sheetName === SHEET_OIL) {
-      updateFleetStatus(values[3], null, values[5]);
-
-    } else if (sheetName === SHEET_ACCIDENTS) {
-      updateFleetStatus(values[3], values[6], null);
-    }
-
-    return jsonResponse({ success: true, message: 'Saved', row: targetSheet.getLastRow() });
-
-  } catch (err) {
-    return jsonResponse({ success: false, error: err.message });
-  }
-}
-
-// ============================================================
-// Update vehicle status in Fleet sheet
-// ============================================================
-function updateFleetStatus(plate, status, km) {
-  if (!plate) return;
-  var ss         = SpreadsheetApp.getActiveSpreadsheet();
-  var fleetSheet = ss.getSheetByName(SHEET_FLEET);
-  if (!fleetSheet) return;
-  var data = fleetSheet.getDataRange().getValues();
-  for (var i = 1; i < data.length; i++) {
-    if (String(data[i][0]) === String(plate)) {
-      if (status) fleetSheet.getRange(i + 1, 8).setValue(status);
-      if (km)     fleetSheet.getRange(i + 1, 9).setValue(km);
-      break;
-    }
-  }
-}
-
-// ============================================================
-// Helpers
-// ============================================================
-function jsonResponse(data) {
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function jsonOk(msg) {
-  return jsonResponse({ success: true, message: msg });
-}
-
-// ============================================================
-// onOpen menu
+// onOpen Menu
 // ============================================================
 function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('Fleet Platform')
-    .addItem('Setup all sheets', 'setupSheets')
-    .addItem('Clear test data',  'clearTestData')
-    .addToUi();
-}
-
-function clearTestData() {
-  var ui       = SpreadsheetApp.getUi();
-  var response = ui.alert('Warning', 'Delete all test data?', ui.ButtonSet.YES_NO);
-  if (response !== ui.Button.YES) return;
-  var ss     = SpreadsheetApp.getActiveSpreadsheet();
-  var sheets = [SHEET_TRACKING, SHEET_ACCIDENTS, SHEET_MAINTENANCE, SHEET_OIL];
-  for (var s = 0; s < sheets.length; s++) {
-    var sheet = ss.getSheetByName(sheets[s]);
-    if (sheet && sheet.getLastRow() > 1) {
-      sheet.deleteRows(2, sheet.getLastRow() - 1);
-    }
+  try {
+    SpreadsheetApp.getUi()
+      .createMenu("Fleet System")
+      .addItem("Setup Sheets", "setupSheets")
+      .addToUi();
+  } catch (e3) {
+    Logger.log("onOpen: " + e3);
   }
-  ui.alert('Test data cleared.');
 }
