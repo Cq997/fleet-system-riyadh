@@ -146,20 +146,86 @@ function تحميل_البيانات() {
   });
 }
 
-// ====== تحميل شيت واحد ======
+// ====== تحميل كل البيانات دفعة واحدة ======
+var _بيانات_كاملة_محملة = false;
+function تحميل_كل_البيانات_دفعة_واحدة() {
+  if (_بيانات_كاملة_محملة) return;
+  var اسم_callback = 'cb_all_' + Date.now();
+  window[اسم_callback] = function(استجابة) {
+    try { delete window[اسم_callback]; } catch(e) {}
+    if (استجابة && (استجابة.status === 'success' || استجابة.fleet !== undefined)) {
+      _بيانات_كاملة_محملة = true;
+      وضع_الاتصال = true;
+      // تحميل بيانات الأسطول
+      if (استجابة.fleet && استجابة.fleet.length > 0) {
+        بيانات_الاسطول_المحلية = استجابة.fleet;
+        ملء_قوائم_اللوحات();
+      }
+      // تحميل بيانات الرصد
+      if (استجابة.tracking) بيانات_الرصد = استجابة.tracking;
+      // تحميل بيانات الحوادث
+      if (استجابة.accidents) {
+        بيانات_الحوادث = استجابة.accidents;
+        تحديث_جدول_الحوادث();
+      }
+      // تحميل بيانات الصيانة
+      if (استجابة.maintenance) {
+        بيانات_الصيانة_الوقائية = استجابة.maintenance;
+        تحديث_جدول_الصيانة();
+      }
+      // تحميل بيانات تغيير الزيت
+      if (استجابة.oil) {
+        بيانات_تغيير_الزيت = استجابة.oil;
+        تحديث_جدول_تغيير_الزيت();
+        فحص_تنبيهات_الزيت();
+      }
+      تحديث_لوحة_القائد();
+      تحديث_حالة_الاتصال();
+    } else {
+      وضع_الاتصال = false;
+      تحديث_حالة_الاتصال();
+    }
+  };
+  var script = document.createElement('script');
+  script.src = SCRIPT_URL + '?action=getAll&callback=' + اسم_callback;
+  script.onerror = function() {
+    try { delete window[اسم_callback]; } catch(e) {}
+    وضع_الاتصال = false;
+    تحديث_حالة_الاتصال();
+  };
+  document.head.appendChild(script);
+  setTimeout(function() {
+    if (window[اسم_callback]) {
+      try { delete window[اسم_callback]; } catch(e) {}
+      وضع_الاتصال = false;
+      تحديث_حالة_الاتصال();
+    }
+  }, 15000);
+}
+
+// ====== تحميل شيت واحد (للتوافق) ======
 function تحميل_شيت(اسم_الشيت, دالة_الاستجابة) {
-  var رابط = SCRIPT_URL + '?action=get&sheet=' + encodeURIComponent(اسم_الشيت);
+  // استخدام getAll بدلاً من get لأن السكريبت المنشور يدعمها
   var اسم_callback = 'cb_' + اسم_الشيت.replace(/\s/g,'_') + '_' + Date.now();
   window[اسم_callback] = function(استجابة) {
     try { delete window[اسم_callback]; } catch(e) {}
-    if (استجابة && استجابة.status === 'success') {
-      دالة_الاستجابة(استجابة.data || []);
+    if (استجابة && (استجابة.status === 'success' || استجابة.fleet !== undefined)) {
+      // تحديد البيانات المطلوبة حسب اسم الشيت
+      var خريطة = {
+        'الأسطول': 'fleet',
+        'رصد المركبات': 'tracking',
+        'الحوادث': 'accidents',
+        'الصيانة الوقائية': 'maintenance',
+        'تغيير الزيت': 'oil'
+      };
+      var مفتاح = خريطة[اسم_الشيت];
+      دالة_الاستجابة(مفتاح && استجابة[مفتاح] ? استجابة[مفتاح] : []);
     } else {
       دالة_الاستجابة(null);
     }
   };
   var script = document.createElement('script');
-  script.src = رابط + '&callback=' + اسم_callback;
+  script.src = SCRIPT_URL + '?action=getAll&callback=' + اسم_callback;
   script.onerror = function() {
     try { delete window[اسم_callback]; } catch(e) {}
     دالة_الاستجابة(null);
@@ -170,7 +236,7 @@ function تحميل_شيت(اسم_الشيت, دالة_الاستجابة) {
       try { delete window[اسم_callback]; } catch(e) {}
       دالة_الاستجابة(null);
     }
-  }, 10000);
+  }, 15000);
 }
 
 // ====== حفظ في شيت ======
