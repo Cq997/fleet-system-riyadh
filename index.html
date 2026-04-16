@@ -1,932 +1,1066 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة صيانة وتشغيل الأسطول | هيئة الهلال الأحمر السعودي - منطقة الرياض</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚑</text></svg>">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=3.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة صيانة وتشغيل الأسطول | هيئة الهلال الأحمر السعودي - منطقة الرياض</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="style.css?v=4.0">
+<style>
+/* ====== المتغيرات الأساسية ====== */
+:root {
+  --أخضر-داكن: #0d3b1e;
+  --أخضر-رئيسي: #1a7a3c;
+  --أخضر-فاتح: #27ae60;
+  --أحمر: #c0392b;
+  --ذهبي: #d4a017;
+  --خلفية-رئيسية: #0a1a0f;
+  --خلفية-ثانوية: #0f2518;
+  --خلفية-بطاقة: #122b1a;
+  --خلفية-حقل: #0d2015;
+  --حدود: #1e4a2a;
+  --نص-رئيسي: #e8f5e9;
+  --نص-ثانوي: #81c784;
+  --نص-رمادي: #4a7a56;
+  --ظل: 0 4px 20px rgba(0,0,0,0.4);
+  --انتقال: all 0.3s ease;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; font-family:'Cairo',sans-serif; background:var(--خلفية-رئيسية); color:var(--نص-رئيسي); overflow-x:hidden; }
+
+/* ====== التخطيط الرئيسي ====== */
+.تخطيط { display:flex; min-height:100vh; }
+
+/* ====== الشريط الجانبي ====== */
+.شريط-جانبي {
+  width:260px; min-height:100vh; background:var(--خلفية-ثانوية);
+  border-left:1px solid var(--حدود); display:flex; flex-direction:column;
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  transition:var(--انتقال); z-index:100;
+}
+.رأس-الشريط {
+  padding:20px 15px; text-align:center;
+  background:linear-gradient(135deg, var(--أخضر-داكن), var(--أخضر-رئيسي));
+  border-bottom:2px solid var(--ذهبي);
+}
+.شعار-الشريط { font-size:40px; margin-bottom:8px; }
+.عنوان-الشريط { font-size:13px; font-weight:800; color:#fff; line-height:1.4; }
+.عنوان-فرعي-الشريط { font-size:11px; color:rgba(255,255,255,0.7); margin-top:4px; }
+.قائمة-التنقل { flex:1; padding:10px 0; }
+.عنوان-قسم-قائمة { font-size:10px; font-weight:700; color:var(--نص-رمادي); padding:10px 15px 5px; text-transform:uppercase; letter-spacing:1px; }
+.زر-قائمة-جانبية {
+  display:flex; align-items:center; gap:10px; width:100%;
+  padding:10px 15px; background:transparent; border:none; cursor:pointer;
+  color:var(--نص-ثانوي); font-family:'Cairo',sans-serif; font-size:13px;
+  text-align:right; transition:var(--انتقال); border-right:3px solid transparent;
+  position:relative;
+}
+.زر-قائمة-جانبية:hover { background:rgba(26,122,60,0.15); color:#fff; }
+.زر-قائمة-جانبية.نشط { background:rgba(26,122,60,0.25); color:#fff; border-right-color:var(--أخضر-فاتح); font-weight:700; }
+.أيقونة-قائمة { font-size:16px; width:20px; text-align:center; }
+.شارة-قائمة { margin-right:auto; background:var(--أحمر); color:#fff; border-radius:10px; padding:2px 7px; font-size:10px; font-weight:700; }
+.تذييل-الشريط { padding:15px; border-top:1px solid var(--حدود); font-size:11px; color:var(--نص-رمادي); text-align:center; line-height:1.8; }
+.حالة-الاتصال { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:8px; font-size:11px; }
+.نقطة-الحالة { width:8px; height:8px; border-radius:50%; background:#888; }
+.حالة-الاتصال.متصل .نقطة-الحالة { background:var(--أخضر-فاتح); box-shadow:0 0 6px var(--أخضر-فاتح); }
+.حالة-الاتصال.غير-متصل .نقطة-الحالة { background:var(--أحمر); }
+
+/* ====== المحتوى الرئيسي ====== */
+.محتوى-رئيسي { flex:1; overflow-y:auto; }
+.قسم-محتوى { display:none; padding:25px; animation:ظهور 0.3s ease; }
+.قسم-محتوى.نشط { display:block; }
+@keyframes ظهور { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ====== رأس الصفحة ====== */
+.رأس-الصفحة { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+.رأس-الصفحة h2 { font-size:20px; font-weight:800; color:#fff; }
+.أزرار-رأس-الصفحة { display:flex; gap:8px; flex-wrap:wrap; }
+
+/* ====== الأزرار ====== */
+.زر { padding:8px 16px; border:none; border-radius:8px; cursor:pointer; font-family:'Cairo',sans-serif; font-size:12px; font-weight:600; transition:var(--انتقال); display:inline-flex; align-items:center; gap:5px; }
+.زر-رئيسي { background:var(--أخضر-رئيسي); color:#fff; }
+.زر-رئيسي:hover { background:var(--أخضر-فاتح); }
+.زر-ثانوي { background:rgba(255,255,255,0.1); color:var(--نص-رئيسي); border:1px solid var(--حدود); }
+.زر-ثانوي:hover { background:rgba(255,255,255,0.15); }
+.زر-خطر { background:rgba(192,57,43,0.2); color:#e74c3c; border:1px solid rgba(192,57,43,0.3); }
+.زر-خطر:hover { background:rgba(192,57,43,0.35); }
+.زر-تصدير { background:linear-gradient(135deg,#1a5276,#2980b9); color:#fff; }
+.زر-تصدير:hover { background:linear-gradient(135deg,#2980b9,#3498db); }
+
+/* ====== شريط الفلتر ====== */
+.شريط-فلتر { background:var(--خلفية-بطاقة); border:1px solid var(--حدود); border-radius:12px; padding:15px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; }
+.مجموعة-فلتر { display:flex; flex-direction:column; gap:5px; min-width:140px; }
+.مجموعة-فلتر label { font-size:11px; color:var(--نص-رمادي); font-weight:600; }
+.مجموعة-فلتر input, .مجموعة-فلتر select { padding:7px 10px; background:var(--خلفية-حقل); border:1px solid var(--حدود); border-radius:8px; color:var(--نص-رئيسي); font-family:'Cairo',sans-serif; font-size:12px; }
+.مجموعة-فلتر input:focus, .مجموعة-فلتر select:focus { outline:none; border-color:var(--أخضر-رئيسي); }
+
+/* ====== بطاقات الإحصاء ====== */
+.شبكة-احصاء { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:20px; }
+.بطاقة-احصاء { background:var(--خلفية-بطاقة); border:1px solid var(--حدود); border-radius:12px; padding:18px; text-align:center; transition:var(--انتقال); position:relative; overflow:hidden; }
+.بطاقة-احصاء::before { content:''; position:absolute; top:0; right:0; left:0; height:3px; background:var(--أخضر-رئيسي); }
+.بطاقة-احصاء.أزرق::before { background:#2980b9; }
+.بطاقة-احصاء.أخضر::before { background:var(--أخضر-فاتح); }
+.بطاقة-احصاء.أصفر::before { background:#f39c12; }
+.بطاقة-احصاء.أحمر::before { background:var(--أحمر); }
+.بطاقة-احصاء.برتقالي::before { background:#e67e22; }
+.بطاقة-احصاء:hover { transform:translateY(-3px); box-shadow:var(--ظل); }
+.أيقونة-احصاء { font-size:28px; margin-bottom:8px; }
+.قيمة-احصاء { font-size:28px; font-weight:900; color:#fff; }
+.تسمية-احصاء { font-size:11px; color:var(--نص-رمادي); margin-top:4px; }
+
+/* ====== الرسوم البيانية ====== */
+.شبكة-رسوم { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:15px; margin-bottom:20px; }
+.بطاقة-رسم { background:var(--خلفية-بطاقة); border:1px solid var(--حدود); border-radius:12px; padding:18px; }
+.عنوان-رسم { font-size:13px; font-weight:700; color:var(--نص-ثانوي); margin-bottom:12px; }
+
+/* ====== الجداول ====== */
+.حاوية-جدول { background:var(--خلفية-بطاقة); border:1px solid var(--حدود); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.رأس-جدول { display:flex; align-items:center; justify-content:space-between; padding:12px 15px; border-bottom:1px solid var(--حدود); flex-wrap:wrap; gap:8px; }
+.عنوان-جدول { font-size:13px; font-weight:700; color:var(--نص-ثانوي); }
+.جدول-متجاوب { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+thead th { background:var(--أخضر-داكن); color:#fff; padding:10px 12px; font-size:11px; font-weight:700; text-align:center; white-space:nowrap; border-bottom:1px solid var(--حدود); }
+tbody tr { border-bottom:1px solid rgba(30,74,42,0.3); transition:var(--انتقال); }
+tbody tr:hover { background:rgba(26,122,60,0.08); }
+tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص-رئيسي); }
+.صف-تحذير { background:rgba(243,156,18,0.05) !important; }
+.صف-خطر { background:rgba(192,57,43,0.05) !important; }
+
+/* ====== الشارات ====== */
+.شارة { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
+.شارة.عاملة, .شارة.منجز { background:rgba(39,174,96,0.2); color:#27ae60; border:1px solid rgba(39,174,96,0.3); }
+.شارة.صيانة, .شارة.قيد-المعالجة { background:rgba(243,156,18,0.2); color:#f39c12; border:1px solid rgba(243,156,18,0.3); }
+.شارة.خارج-الخدمة, .شارة.مغلق { background:rgba(192,57,43,0.2); color:#e74c3c; border:1px solid rgba(192,57,43,0.3); }
+.شارة.غير-منجز { background:rgba(127,140,141,0.2); color:#95a5a6; border:1px solid rgba(127,140,141,0.3); }
+
+/* ====== النماذج ====== */
+.حاوية-نموذج { background:var(--خلفية-بطاقة); border:1px solid var(--حدود); border-radius:12px; padding:20px; margin-bottom:20px; }
+.عنوان-نموذج { font-size:15px; font-weight:800; color:var(--أخضر-فاتح); margin-bottom:18px; padding-bottom:10px; border-bottom:1px solid var(--حدود); }
+.شبكة-نموذج { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px; }
+.مجموعة-حقل { display:flex; flex-direction:column; gap:6px; }
+.مجموعة-حقل.عرض-كامل { grid-column:1/-1; }
+.مجموعة-حقل label { font-size:12px; color:var(--نص-ثانوي); font-weight:600; }
+.مجموعة-حقل input, .مجموعة-حقل select, .مجموعة-حقل textarea {
+  padding:9px 12px; background:var(--خلفية-حقل); border:1px solid var(--حدود);
+  border-radius:8px; color:var(--نص-رئيسي); font-family:'Cairo',sans-serif; font-size:13px;
+  transition:var(--انتقال);
+}
+.مجموعة-حقل input:focus, .مجموعة-حقل select:focus, .مجموعة-حقل textarea:focus {
+  outline:none; border-color:var(--أخضر-رئيسي); background:rgba(13,59,30,0.8);
+}
+.مجموعة-حقل input[readonly] { background:rgba(26,122,60,0.05); color:var(--نص-رمادي); cursor:not-allowed; }
+.مطلوب { color:var(--أحمر); }
+.زر-حفظ { width:100%; padding:12px; background:linear-gradient(135deg,var(--أخضر-رئيسي),var(--أخضر-فاتح)); color:#fff; border:none; border-radius:10px; font-family:'Cairo',sans-serif; font-size:15px; font-weight:800; cursor:pointer; margin-top:18px; transition:var(--انتقال); }
+.زر-حفظ:hover { background:linear-gradient(135deg,var(--أخضر-فاتح),#2ecc71); transform:translateY(-1px); }
+.زر-حفظ:disabled { background:#333; cursor:not-allowed; transform:none; }
+
+/* ====== بطاقة معلومات المركبة ====== */
+.بطاقة-معلومات-مركبة { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; background:rgba(26,122,60,0.08); border:1px solid rgba(26,122,60,0.3); border-radius:10px; padding:12px; margin:12px 0; }
+.عنصر-معلومات { display:flex; flex-direction:column; gap:3px; }
+.تسمية-معلومات { font-size:10px; color:var(--نص-رمادي); }
+.قيمة-معلومات { font-size:13px; font-weight:700; color:var(--أخضر-فاتح); }
+
+/* ====== التنبيهات ====== */
+.حاوية-تنبيهات { margin-bottom:15px; display:flex; flex-direction:column; gap:8px; }
+.تنبيه { display:flex; align-items:center; gap:10px; padding:10px 15px; border-radius:10px; font-size:12px; }
+.تنبيه.خطر { background:rgba(192,57,43,0.15); border:1px solid rgba(192,57,43,0.3); color:#e74c3c; }
+.تنبيه.تحذير { background:rgba(243,156,18,0.15); border:1px solid rgba(243,156,18,0.3); color:#f39c12; }
+.تنبيه.معلومة { background:rgba(41,128,185,0.15); border:1px solid rgba(41,128,185,0.3); color:#3498db; }
+.تنبيه.نجاح { background:rgba(39,174,96,0.15); border:1px solid rgba(39,174,96,0.3); color:#27ae60; }
+
+/* ====== قائمة تنبيهات الزيت ====== */
+.عنصر-تنبيه { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; margin-bottom:5px; }
+.عنصر-تنبيه.تنبيه-خطر { background:rgba(192,57,43,0.1); border:1px solid rgba(192,57,43,0.2); }
+.عنصر-تنبيه.تنبيه-تحذير { background:rgba(243,156,18,0.1); border:1px solid rgba(243,156,18,0.2); }
+.رقم-لوحة-تنبيه { font-weight:800; font-size:13px; min-width:100px; }
+.تفاصيل-تنبيه { flex:1; font-size:11px; color:var(--نص-رمادي); }
+.نوع-تنبيه { font-size:11px; font-weight:600; }
+.لا-تنبيهات { text-align:center; padding:20px; color:var(--نص-رمادي); font-size:13px; }
+
+/* ====== الرسائل المنبثقة ====== */
+#حاوية_الرسائل { position:fixed; top:20px; left:20px; z-index:9999; display:flex; flex-direction:column; gap:8px; max-width:350px; }
+.رسالة { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 15px; border-radius:10px; font-size:13px; font-weight:600; box-shadow:var(--ظل); animation:ظهور-رسالة 0.3s ease; }
+@keyframes ظهور-رسالة { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+.رسالة.نجاح { background:#1a4a2a; border:1px solid #27ae60; color:#27ae60; }
+.رسالة.تحذير { background:#3a2a00; border:1px solid #f39c12; color:#f39c12; }
+.رسالة.خطر { background:#3a0a0a; border:1px solid #e74c3c; color:#e74c3c; }
+.رسالة.معلومة { background:#0a1a3a; border:1px solid #3498db; color:#3498db; }
+.رسالة button { background:none; border:none; cursor:pointer; color:inherit; font-size:14px; }
+
+/* ====== شاشة التحميل ====== */
+#شاشة_التحميل { position:fixed; inset:0; background:rgba(10,26,15,0.9); z-index:9998; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:15px; }
+.دوار-تحميل { width:50px; height:50px; border:4px solid rgba(26,122,60,0.2); border-top-color:var(--أخضر-فاتح); border-radius:50%; animation:دوران 0.8s linear infinite; }
+@keyframes دوران { to{transform:rotate(360deg)} }
+.نص-تحميل { color:var(--نص-ثانوي); font-size:14px; }
+
+/* ====== التقارير ====== */
+.تبويبات-تقرير { display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap; }
+.تبويب-تقرير { padding:8px 18px; background:rgba(255,255,255,0.05); border:1px solid var(--حدود); border-radius:20px; cursor:pointer; font-family:'Cairo',sans-serif; font-size:12px; color:var(--نص-رمادي); transition:var(--انتقال); }
+.تبويب-تقرير.نشط { background:var(--أخضر-رئيسي); color:#fff; border-color:var(--أخضر-رئيسي); }
+.تقرير-كامل { background:var(--خلفية-بطاقة); border:1px solid var(--حدود); border-radius:12px; padding:25px; }
+.رأس-تقرير { display:flex; align-items:center; gap:20px; margin-bottom:25px; padding-bottom:15px; border-bottom:2px solid var(--ذهبي); }
+.شعار-تقرير { font-size:50px; }
+.معلومات-تقرير h2 { font-size:16px; color:var(--ذهبي); }
+.معلومات-تقرير h3 { font-size:14px; color:var(--نص-ثانوي); }
+.معلومات-تقرير h4 { font-size:13px; color:var(--أخضر-فاتح); margin-top:5px; }
+.معلومات-تقرير p { font-size:11px; color:var(--نص-رمادي); margin-top:3px; }
+.شبكة-احصائيات-التقرير { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:20px; }
+.بطاقة-احصاء-تقرير { background:rgba(26,122,60,0.1); border:1px solid var(--حدود); border-radius:10px; padding:15px; text-align:center; }
+.رقم-احصاء-تقرير { font-size:24px; font-weight:900; color:#fff; }
+.تسمية-احصاء-تقرير { font-size:10px; color:var(--نص-رمادي); margin-top:3px; }
+.قسم-تقرير { margin-bottom:20px; }
+.قسم-تقرير h4 { font-size:13px; color:var(--نص-ثانوي); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--حدود); }
+.جدول-تقرير { width:100%; border-collapse:collapse; font-size:11px; }
+.جدول-تقرير th { background:var(--أخضر-داكن); color:#fff; padding:8px; text-align:center; }
+.جدول-تقرير td { padding:7px; text-align:center; border-bottom:1px solid rgba(30,74,42,0.3); }
+.توقيعات { display:flex; gap:40px; margin-top:30px; padding-top:20px; border-top:1px solid var(--حدود); flex-wrap:wrap; }
+.توقيع { flex:1; min-width:150px; text-align:center; }
+.اسم-توقيع { font-weight:700; font-size:13px; }
+.لقب-توقيع { font-size:11px; color:var(--نص-رمادي); margin-top:3px; }
+.خط-توقيع { border-top:1px solid var(--حدود); margin-top:40px; }
+
+/* ====== زر الجوال ====== */
+.زر-قائمة-جوال { display:none; position:fixed; top:15px; right:15px; z-index:200; background:var(--أخضر-رئيسي); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:18px; cursor:pointer; }
+.طبقة-شريط-جانبي { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:99; }
+
+/* ====== مؤشر الزيت ====== */
+.مؤشر-زيت { margin:12px 0; padding:12px; background:rgba(26,122,60,0.05); border:1px solid var(--حدود); border-radius:10px; }
+.شريط-تقدم-زيت { height:10px; background:rgba(255,255,255,0.1); border-radius:5px; overflow:hidden; margin-top:8px; }
+.شريط-تقدم-داخلي { height:100%; border-radius:5px; transition:width 0.5s ease; }
+.شريط-تقدم-داخلي.آمن { background:var(--أخضر-فاتح); }
+.شريط-تقدم-داخلي.تحذير { background:#f39c12; }
+.شريط-تقدم-داخلي.خطر { background:var(--أحمر); }
+
+/* ====== زر الجدول ====== */
+.زر-جدول { padding:4px 10px; border:none; border-radius:6px; cursor:pointer; font-family:'Cairo',sans-serif; font-size:11px; font-weight:600; transition:var(--انتقال); }
+.زر-جدول.نجاح { background:rgba(39,174,96,0.2); color:#27ae60; border:1px solid rgba(39,174,96,0.3); }
+.زر-جدول.نجاح:hover { background:rgba(39,174,96,0.35); }
+.زر-جدول.خطر { background:rgba(192,57,43,0.2); color:#e74c3c; border:1px solid rgba(192,57,43,0.3); }
+.تم-الانجاز { color:#27ae60; font-size:11px; }
+
+/* ====== الطباعة ====== */
+@media print {
+  .شريط-جانبي, .أزرار-رأس-الصفحة, .شريط-فلتر, .تبويبات-تقرير, #حاوية_الرسائل { display:none !important; }
+  .محتوى-رئيسي { margin:0 !important; }
+  .تقرير-كامل { border:none; padding:0; }
+  body { background:#fff; color:#000; }
+}
+
+/* ====== الجوال ====== */
+@media (max-width:768px) {
+  .شريط-جانبي { position:fixed; right:-260px; height:100vh; }
+  .شريط-جانبي.مفتوحة { right:0; }
+  .طبقة-شريط-جانبي { display:block; }
+  .زر-قائمة-جوال { display:block; }
+  .محتوى-رئيسي { margin-right:0 !important; }
+  .قسم-محتوى { padding:15px; padding-top:55px; }
+  .شبكة-احصاء { grid-template-columns:repeat(2,1fr); }
+}
+</style>
 </head>
 <body>
 
-<!-- زر القائمة للجوال -->
-<button class="menu-toggle" onclick="toggleSidebar()" title="القائمة">☰</button>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<!-- ====== حاوية الرسائل ====== -->
+<div id="حاوية_الرسائل"></div>
+
+<!-- ====== شاشة التحميل ====== -->
+<div id="شاشة_التحميل" style="display:none">
+  <div class="دوار-تحميل"></div>
+  <div class="نص-تحميل">جاري تحميل بيانات الأسطول...</div>
+</div>
+
+<!-- ====== زر القائمة للجوال ====== -->
+<button class="زر-قائمة-جوال" onclick="تبديل_القائمة_الجانبية()">☰</button>
+<div class="طبقة-شريط-جانبي" id="طبقة_الشريط" onclick="تبديل_القائمة_الجانبية()" style="display:none"></div>
+
+<div class="تخطيط">
 
 <!-- ====== الشريط الجانبي ====== -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo">🚑</div>
-    <div class="sidebar-title">هيئة الهلال الأحمر السعودي</div>
-    <div class="sidebar-subtitle">منصة صيانة وتشغيل الأسطول<br>منطقة الرياض</div>
+<aside class="شريط-جانبي" id="القائمة_الجانبية">
+  <div class="رأس-الشريط">
+    <div class="شعار-الشريط">🌙</div>
+    <div class="عنوان-الشريط">هيئة الهلال الأحمر السعودي</div>
+    <div class="عنوان-فرعي-الشريط">منصة صيانة وتشغيل الأسطول<br>منطقة الرياض</div>
   </div>
-
-  <nav class="sidebar-nav">
-    <div class="nav-section-title">لوحة التحكم</div>
-    <button class="nav-btn active" onclick="showPage('dashboard')" id="btn-dashboard">
-      <span class="nav-icon">📊</span>
+  <nav class="قائمة-التنقل">
+    <div class="عنوان-قسم-قائمة">لوحة التحكم</div>
+    <button class="زر-قائمة-جانبية نشط" id="زر_لوحة_القائد" onclick="عرض_القسم('لوحة_القائد')">
+      <span class="أيقونة-قائمة">📊</span>
       <span>لوحة القائد</span>
-      <span class="nav-badge" id="alertBadge" style="display:none">0</span>
+      <span class="شارة-قائمة" id="شارة_التنبيهات" style="display:none">0</span>
     </button>
-
-    <div class="nav-section-title">النماذج التشغيلية</div>
-    <button class="nav-btn" onclick="showPage('fleet')" id="btn-fleet">
-      <span class="nav-icon">🚑</span>
-      <span>الأسطول</span>
+    <div class="عنوان-قسم-قائمة">النماذج التشغيلية</div>
+    <button class="زر-قائمة-جانبية" id="زر_الأسطول" onclick="عرض_القسم('الأسطول');تحديث_جدول_الاسطول('','','')">
+      <span class="أيقونة-قائمة">🚑</span>
+      <span>الأسطول (397 مركبة)</span>
     </button>
-    <button class="nav-btn" onclick="showPage('tracking')" id="btn-tracking">
-      <span class="nav-icon">📍</span>
+    <button class="زر-قائمة-جانبية" id="زر_الرصد" onclick="عرض_القسم('الرصد')">
+      <span class="أيقونة-قائمة">📍</span>
       <span>رصد المركبات</span>
     </button>
-    <button class="nav-btn" onclick="showPage('accidents')" id="btn-accidents">
-      <span class="nav-icon">🚧</span>
+    <button class="زر-قائمة-جانبية" id="زر_الحوادث" onclick="عرض_القسم('الحوادث');تحديث_جدول_الحوادث()">
+      <span class="أيقونة-قائمة">🚧</span>
       <span>الحوادث</span>
     </button>
-    <button class="nav-btn" onclick="showPage('maintenance')" id="btn-maintenance">
-      <span class="nav-icon">🔧</span>
+    <button class="زر-قائمة-جانبية" id="زر_الصيانة" onclick="عرض_القسم('الصيانة');تحديث_جدول_الصيانة()">
+      <span class="أيقونة-قائمة">🔧</span>
       <span>الصيانة الوقائية</span>
     </button>
-    <button class="nav-btn" onclick="showPage('oil')" id="btn-oil">
-      <span class="nav-icon">🛢️</span>
+    <button class="زر-قائمة-جانبية" id="زر_الزيت" onclick="عرض_القسم('الزيت');تحديث_جدول_تغيير_الزيت()">
+      <span class="أيقونة-قائمة">🛢️</span>
       <span>تغيير الزيت</span>
     </button>
-
-    <div class="nav-section-title">التقارير</div>
-    <button class="nav-btn" onclick="showPage('reports')" id="btn-reports">
-      <span class="nav-icon">📈</span>
+    <div class="عنوان-قسم-قائمة">التقارير</div>
+    <button class="زر-قائمة-جانبية" id="زر_التقارير" onclick="عرض_القسم('التقارير')">
+      <span class="أيقونة-قائمة">📈</span>
       <span>التقارير والإحصائيات</span>
     </button>
   </nav>
-
-  <div class="sidebar-footer">
-    <div>👤 قائد الأسطول: ثامر عياد الحربي</div>
-    <div>💻 تطوير: علي 102459@srca</div>
-    <div id="connectionStatus" class="connection-status" style="justify-content:center;margin-top:5px">
-      <span class="status-dot" id="statusDot"></span>
-      <span id="statusText">جاري الاتصال...</span>
+  <div class="تذييل-الشريط">
+    <div>👤 ثامر عياد الحربي</div>
+    <div>💻 علي 102459@srca</div>
+    <div id="حالة_الاتصال" class="حالة-الاتصال غير-متصل">
+      <span class="نقطة-الحالة"></span>
+      <span id="نص_الحالة">جاري الاتصال...</span>
+    </div>
+    <div style="margin-top:8px">
+      <button class="زر زر-ثانوي" onclick="تحديث_الصفحة()" style="font-size:11px;padding:5px 10px">🔄 تحديث</button>
     </div>
   </div>
 </aside>
 
 <!-- ====== المحتوى الرئيسي ====== -->
-<main class="main" id="mainContent">
+<main class="محتوى-رئيسي">
 
-  <!-- ======================================
-       📊 لوحة القائد
-  ====================================== -->
-  <section id="page-dashboard" class="page-section">
-    <div class="page-header">
-      <h2>📊 لوحة القائد</h2>
-      <div class="page-header-actions">
-        <button class="btn btn-secondary btn-sm" onclick="refreshDashboard()">🔄 تحديث</button>
-        <button class="btn btn-info btn-sm" onclick="exportReportPDF()">📄 تصدير PDF</button>
-      </div>
-    </div>
-
-    <!-- فلترة التقارير -->
-    <div class="filter-bar">
-      <div class="filter-group">
-        <label>نوع التقرير</label>
-        <select id="reportType" onchange="updateDateRange()">
-          <option value="monthly">شهري</option>
-          <option value="quarterly">ربع سنوي</option>
-          <option value="annual">سنوي</option>
-          <option value="custom">مخصص</option>
-        </select>
-      </div>
-      <div class="filter-group" id="quarterGroup" style="display:none">
-        <label>الربع</label>
-        <select id="quarterSelect">
-          <option value="1">الربع الأول (يناير - مارس)</option>
-          <option value="2">الربع الثاني (أبريل - يونيو)</option>
-          <option value="3">الربع الثالث (يوليو - سبتمبر)</option>
-          <option value="4">الربع الرابع (أكتوبر - ديسمبر)</option>
-        </select>
-      </div>
-      <div class="filter-group" id="monthGroup">
-        <label>الشهر</label>
-        <select id="monthSelect">
-          <option value="1">يناير</option><option value="2">فبراير</option>
-          <option value="3">مارس</option><option value="4">أبريل</option>
-          <option value="5">مايو</option><option value="6">يونيو</option>
-          <option value="7">يوليو</option><option value="8">أغسطس</option>
-          <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
-          <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>السنة</label>
-        <select id="yearSelect"></select>
-      </div>
-      <div class="filter-group" id="customDateGroup" style="display:none">
-        <label>من تاريخ</label>
-        <input type="date" id="fromDate">
-      </div>
-      <div class="filter-group" id="customDateGroup2" style="display:none">
-        <label>إلى تاريخ</label>
-        <input type="date" id="toDate">
-      </div>
-      <div class="filter-group">
-        <label>القطاع</label>
-        <select id="filterSector"><option value="">الكل</option></select>
-      </div>
-      <div class="filter-group">
-        <label>الحالة</label>
-        <select id="filterStatus">
-          <option value="">الكل</option>
-          <option value="عاملة">عاملة</option>
-          <option value="خارج الخدمة">خارج الخدمة</option>
-          <option value="صيانة">صيانة</option>
-        </select>
-      </div>
-      <div class="filter-group" style="justify-content:flex-end">
-        <label>&nbsp;</label>
-        <button class="btn btn-primary" onclick="applyDashboardFilter()">🔍 تطبيق</button>
-      </div>
-    </div>
-
-    <!-- التنبيهات الهامة -->
-    <div id="alertsContainer" class="alerts-container"></div>
-
-    <!-- الإحصائيات الرئيسية -->
-    <div class="stats-grid" id="mainStats">
-      <div class="stat-card blue">
-        <div class="stat-icon">🚑</div>
-        <div class="stat-value" id="stat-total">0</div>
-        <div class="stat-label">إجمالي الأسطول</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-icon">✅</div>
-        <div class="stat-value" id="stat-ready">0</div>
-        <div class="stat-label">مركبات جاهزة</div>
-      </div>
-      <div class="stat-card yellow">
-        <div class="stat-icon">🔧</div>
-        <div class="stat-value" id="stat-maint">0</div>
-        <div class="stat-label">تحت الصيانة</div>
-      </div>
-      <div class="stat-card red">
-        <div class="stat-icon">❌</div>
-        <div class="stat-value" id="stat-out">0</div>
-        <div class="stat-label">خارج الخدمة</div>
-      </div>
-      <div class="stat-card orange">
-        <div class="stat-icon">🚧</div>
-        <div class="stat-value" id="stat-accidents">0</div>
-        <div class="stat-label">حوادث مسجلة</div>
-      </div>
-      <div class="stat-card yellow">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-value" id="stat-pending">0</div>
-        <div class="stat-label">طلبات معلقة</div>
-      </div>
-    </div>
-
-    <!-- الرسوم البيانية -->
-    <div class="charts-grid">
-      <div class="chart-card">
-        <div class="chart-title">📊 توزيع حالات الأسطول</div>
-        <canvas id="fleetStatusChart" height="200"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">📈 الصيانة الشهرية</div>
-        <canvas id="maintenanceChart" height="200"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">🚧 الحوادث حسب القطاع</div>
-        <canvas id="accidentsChart" height="200"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">🛢️ تغيير الزيت - الحالة</div>
-        <canvas id="oilChart" height="200"></canvas>
-      </div>
-    </div>
-
-    <!-- آخر الأنشطة -->
-    <div class="table-container">
-      <div class="table-header">
-        <span class="table-title">📋 آخر الأنشطة والعمليات</span>
-        <button class="btn btn-secondary btn-sm" onclick="showPage('reports')">عرض الكل</button>
-      </div>
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>التاريخ</th>
-              <th>النوع</th>
-              <th>رقم اللوحة</th>
-              <th>القطاع</th>
-              <th>الحالة</th>
-              <th>الإنجاز</th>
-            </tr>
-          </thead>
-          <tbody id="recentActivities">
-            <tr><td colspan="6" style="color:var(--text-secondary);padding:20px">جاري تحميل البيانات...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================
-       🚑 الأسطول
-  ====================================== -->
-  <section id="page-fleet" class="page-section" style="display:none">
-    <div class="page-header">
-      <h2>🚑 شيت الأسطول (397 مركبة)</h2>
-      <div class="page-header-actions">
-        <button class="btn btn-secondary btn-sm" onclick="refreshFleet()">🔄 تحديث</button>
-        <button class="btn btn-info btn-sm" onclick="exportFleetPDF()">📄 PDF</button>
-      </div>
-    </div>
-
-    <div class="filter-bar">
-      <div class="filter-group">
-        <label>بحث</label>
-        <input type="text" id="fleetSearch" placeholder="رقم اللوحة، النوع، الموديل..." oninput="filterFleetTable()">
-      </div>
-      <div class="filter-group">
-        <label>القطاع</label>
-        <select id="fleetSectorFilter" onchange="filterFleetTable()">
-          <option value="">الكل</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>الحالة</label>
-        <select id="fleetStatusFilter" onchange="filterFleetTable()">
-          <option value="">الكل</option>
-          <option value="جاهزة">جاهزة</option>
-          <option value="صيانة">صيانة</option>
-          <option value="خارج الخدمة">خارج الخدمة</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="table-container">
-      <div class="table-header">
-        <span class="table-title">🚑 قائمة المركبات</span>
-        <span id="fleetCount" style="font-size:12px;color:var(--text-secondary)">إجمالي: 0 مركبة</span>
-      </div>
-      <div class="table-responsive records-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>رقم اللوحة</th>
-              <th>النوع</th>
-              <th>الموديل</th>
-              <th>رقم الشاصي</th>
-              <th>القطاع</th>
-              <th>المركز</th>
-              <th>الحالة</th>
-              <th>آخر قراءة عداد</th>
-            </tr>
-          </thead>
-          <tbody id="fleetTableBody">
-            <tr><td colspan="9" style="color:var(--text-secondary);padding:20px">جاري تحميل بيانات الأسطول...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================
-       📍 رصد المركبات
-  ====================================== -->
-  <section id="page-tracking" class="page-section" style="display:none">
-    <div class="page-header">
-      <h2>📍 نموذج رصد المركبات</h2>
-    </div>
-
-    <div class="form-container">
-      <div class="form-title">📍 تسجيل موقع / حركة المركبة</div>
-      <form onsubmit="submitTracking(event)">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>التاريخ <span class="required">*</span></label>
-            <input type="date" id="t_date" required>
-          </div>
-          <div class="form-group">
-            <label>الوقت <span class="required">*</span></label>
-            <input type="time" id="t_time" required>
-          </div>
-          <div class="form-group">
-            <label>اسم مدخل البيانات <span class="required">*</span></label>
-            <input type="text" id="t_user" placeholder="اسم الموظف" required>
-          </div>
-          <div class="form-group">
-            <label>رقم اللوحة <span class="required">*</span></label>
-            <select id="t_plate" onchange="fillVehicleInfo('t', this.value)" required>
-              <option value="">-- اختر المركبة --</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- بطاقة معلومات المركبة -->
-        <div class="vehicle-info-card" id="t_vehicleInfo" style="display:none">
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">النوع</span>
-            <span class="vehicle-info-value" id="t_vType">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">الموديل</span>
-            <span class="vehicle-info-value" id="t_vModel">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">رقم الشاصي</span>
-            <span class="vehicle-info-value" id="t_vChassis">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">الحالة الحالية</span>
-            <span class="vehicle-info-value" id="t_vStatus">-</span>
-          </div>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label>نوع القطاع <span class="required">*</span></label>
-            <select id="t_sectorType" onchange="updateSectors('t')" required>
-              <option value="">-- اختر --</option>
-              <option value="داخلي">داخلي</option>
-              <option value="خارجي">خارجي</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>القطاع <span class="required">*</span></label>
-            <select id="t_sector" onchange="updateCenters('t')" required>
-              <option value="">-- اختر القطاع --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>المركز الإسعافي <span class="required">*</span></label>
-            <select id="t_center" required>
-              <option value="">-- اختر المركز --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>حالة المركبة <span class="required">*</span></label>
-            <select id="t_status" required>
-              <option value="عاملة">✅ عاملة</option>
-              <option value="خارج الخدمة">❌ خارج الخدمة</option>
-              <option value="صيانة">🔧 صيانة</option>
-            </select>
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات</label>
-            <textarea id="t_notes" placeholder="أي ملاحظات إضافية..." rows="2"></textarea>
-          </div>
-        </div>
-        <button type="submit" class="btn-submit">📍 إرسال بيانات الرصد</button>
-      </form>
-    </div>
-
-    <!-- سجل الرصد -->
-    <div class="table-container">
-      <div class="table-header">
-        <span class="table-title">📋 سجل الرصد الأخير</span>
-        <button class="btn btn-secondary btn-sm" onclick="loadTrackingRecords()">🔄 تحديث</button>
-      </div>
-      <div class="table-responsive records-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>التاريخ</th><th>الوقت</th><th>المدخل</th>
-              <th>رقم اللوحة</th><th>نوع القطاع</th><th>القطاع</th>
-              <th>المركز</th><th>الحالة</th>
-            </tr>
-          </thead>
-          <tbody id="trackingRecords">
-            <tr><td colspan="8" style="color:var(--text-secondary);padding:20px">لا توجد سجلات</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================
-       🚧 الحوادث
-  ====================================== -->
-  <section id="page-accidents" class="page-section" style="display:none">
-    <div class="page-header">
-      <h2>🚧 نموذج الحوادث</h2>
-    </div>
-
-    <div class="form-container">
-      <div class="form-title">🚧 تسجيل حادث مركبة</div>
-      <form onsubmit="submitAccident(event)">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>التاريخ <span class="required">*</span></label>
-            <input type="date" id="a_date" required>
-          </div>
-          <div class="form-group">
-            <label>الوقت <span class="required">*</span></label>
-            <input type="time" id="a_time" required>
-          </div>
-          <div class="form-group">
-            <label>اسم مدخل البيانات <span class="required">*</span></label>
-            <input type="text" id="a_user" placeholder="اسم الموظف" required>
-          </div>
-          <div class="form-group">
-            <label>رقم اللوحة <span class="required">*</span></label>
-            <select id="a_plate" onchange="fillVehicleInfo('a', this.value)" required>
-              <option value="">-- اختر المركبة --</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="vehicle-info-card" id="a_vehicleInfo" style="display:none">
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">النوع</span>
-            <span class="vehicle-info-value" id="a_vType">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">الموديل</span>
-            <span class="vehicle-info-value" id="a_vModel">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">رقم الشاصي</span>
-            <span class="vehicle-info-value" id="a_vChassis">-</span>
-          </div>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label>سبب الحادث <span class="required">*</span></label>
-            <input type="text" id="a_reason" placeholder="وصف سبب الحادث" required>
-          </div>
-          <div class="form-group full-width">
-            <label>موقع الحادث <span class="required">*</span></label>
-            <input type="text" id="a_location" placeholder="الموقع التفصيلي للحادث" required>
-          </div>
-          <div class="form-group">
-            <label>حالة المركبة بعد الحادث <span class="required">*</span></label>
-            <select id="a_vehicleStatus" required>
-              <option value="عاملة">✅ عاملة</option>
-              <option value="خارج الخدمة">❌ خارج الخدمة</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>اسم القطاع <span class="required">*</span></label>
-            <input type="text" id="a_sector" placeholder="اسم القطاع" required>
-          </div>
-          <div class="form-group">
-            <label>نسبة الخطأ (%) <span class="required">*</span></label>
-            <input type="number" id="a_errorPercent" min="0" max="100" placeholder="0-100" required>
-          </div>
-          <div class="form-group">
-            <label>رقم تسجيل الحادث في أنظمة المرور</label>
-            <input type="text" id="a_reportNumber" placeholder="رقم التقرير">
-          </div>
-          <div class="form-group">
-            <label>جهة التقرير <span class="required">*</span></label>
-            <select id="a_authority" required>
-              <option value="نجم">نجم</option>
-              <option value="مرور">مرور</option>
-              <option value="شرطة">شرطة</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>حالة الإنجاز <span class="required">*</span></label>
-            <select id="a_done" required>
-              <option value="غير منجز">⏳ غير منجز</option>
-              <option value="منجز">✅ منجز</option>
-            </select>
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات إضافية</label>
-            <textarea id="a_notes" placeholder="أي تفاصيل إضافية..." rows="2"></textarea>
-          </div>
-        </div>
-        <button type="submit" class="btn-submit">🚧 تسجيل الحادث</button>
-      </form>
-    </div>
-
-    <!-- سجل الحوادث -->
-    <div class="table-container">
-      <div class="table-header">
-        <span class="table-title">📋 سجل الحوادث</span>
-        <div style="display:flex;gap:8px">
-          <select id="accidentFilter" onchange="filterAccidents()" style="width:auto;padding:5px 10px;font-size:12px">
-            <option value="">الكل</option>
-            <option value="منجز">منجز</option>
-            <option value="غير منجز">غير منجز</option>
-          </select>
-          <button class="btn btn-secondary btn-sm" onclick="loadAccidentRecords()">🔄 تحديث</button>
-        </div>
-      </div>
-      <div class="table-responsive records-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>التاريخ</th><th>الوقت</th><th>رقم اللوحة</th>
-              <th>السبب</th><th>الموقع</th><th>حالة المركبة</th>
-              <th>القطاع</th><th>نسبة الخطأ</th><th>رقم التقرير</th>
-              <th>الجهة</th><th>الإنجاز</th>
-            </tr>
-          </thead>
-          <tbody id="accidentRecords">
-            <tr><td colspan="11" style="color:var(--text-secondary);padding:20px">لا توجد سجلات</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================
-       🔧 الصيانة الوقائية
-  ====================================== -->
-  <section id="page-maintenance" class="page-section" style="display:none">
-    <div class="page-header">
-      <h2>🔧 نموذج الصيانة الوقائية الدورية</h2>
-    </div>
-
-    <div class="form-container">
-      <div class="form-title">🔧 كرت الصيانة</div>
-      <form onsubmit="submitMaintenance(event)">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>تاريخ الدخول للصيانة <span class="required">*</span></label>
-            <input type="date" id="m_dateIn" required>
-          </div>
-          <div class="form-group">
-            <label>وقت الدخول <span class="required">*</span></label>
-            <input type="time" id="m_timeIn" required>
-          </div>
-          <div class="form-group">
-            <label>تاريخ الخروج من الصيانة</label>
-            <input type="date" id="m_dateOut">
-          </div>
-          <div class="form-group">
-            <label>وقت الخروج</label>
-            <input type="time" id="m_timeOut">
-          </div>
-          <div class="form-group">
-            <label>اسم مدخل البيانات <span class="required">*</span></label>
-            <input type="text" id="m_user" placeholder="اسم الموظف" required>
-          </div>
-          <div class="form-group">
-            <label>رقم اللوحة <span class="required">*</span></label>
-            <select id="m_plate" onchange="fillVehicleInfo('m', this.value)" required>
-              <option value="">-- اختر المركبة --</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="vehicle-info-card" id="m_vehicleInfo" style="display:none">
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">النوع</span>
-            <span class="vehicle-info-value" id="m_vType">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">الموديل</span>
-            <span class="vehicle-info-value" id="m_vModel">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">رقم الشاصي</span>
-            <span class="vehicle-info-value" id="m_vChassis">-</span>
-          </div>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label>نوع العطل <span class="required">*</span></label>
-            <select id="m_faultType" required>
-              <option value="">-- اختر --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>وصف العطل <span class="required">*</span></label>
-            <select id="m_faultDesc" required>
-              <option value="">-- اختر --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>درجة العطل <span class="required">*</span></label>
-            <select id="m_severity" required>
-              <option value="خفيف">🟢 خفيف</option>
-              <option value="متوسط">🟡 متوسط</option>
-              <option value="ثقيل">🔴 ثقيل</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>اسم الفني المختص <span class="required">*</span></label>
-            <select id="m_tech" required>
-              <option value="">-- اختر الفني --</option>
-            </select>
-          </div>
-          <div class="form-group full-width">
-            <label>قطع الغيار المطلوبة</label>
-            <textarea id="m_parts" placeholder="اذكر قطع الغيار المطلوبة..." rows="2"></textarea>
-          </div>
-          <div class="form-group">
-            <label>هل تحتاج ورشة خارجية؟</label>
-            <select id="m_external" onchange="toggleWorkshop()">
-              <option value="لا">لا</option>
-              <option value="نعم">نعم</option>
-            </select>
-          </div>
-          <div class="form-group" id="workshopGroup" style="display:none">
-            <label>اسم الورشة الخارجية</label>
-            <input type="text" id="m_workshop" placeholder="اسم الورشة">
-          </div>
-          <div class="form-group">
-            <label>حالة الإنجاز <span class="required">*</span></label>
-            <select id="m_status" required>
-              <option value="غير منجز">⏳ غير منجز</option>
-              <option value="منجز">✅ منجز</option>
-            </select>
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات</label>
-            <textarea id="m_notes" placeholder="ملاحظات إضافية..." rows="2"></textarea>
-          </div>
-        </div>
-        <button type="submit" class="btn-submit">🔧 حفظ كرت الصيانة</button>
-      </form>
-    </div>
-
-    <!-- سجل الصيانة -->
-    <div class="table-container">
-      <div class="table-header">
-        <span class="table-title">📋 سجل الصيانة</span>
-        <div style="display:flex;gap:8px">
-          <select id="maintFilter" onchange="filterMaintenance()" style="width:auto;padding:5px 10px;font-size:12px">
-            <option value="">الكل</option>
-            <option value="منجز">منجز</option>
-            <option value="غير منجز">غير منجز</option>
-          </select>
-          <button class="btn btn-secondary btn-sm" onclick="loadMaintenanceRecords()">🔄 تحديث</button>
-        </div>
-      </div>
-      <div class="table-responsive records-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>تاريخ الدخول</th><th>تاريخ الخروج</th><th>رقم اللوحة</th>
-              <th>النوع</th><th>الموديل</th><th>نوع العطل</th>
-              <th>الدرجة</th><th>الفني</th><th>قطع الغيار</th>
-              <th>ورشة خارجية</th><th>الإنجاز</th>
-            </tr>
-          </thead>
-          <tbody id="maintenanceRecords">
-            <tr><td colspan="11" style="color:var(--text-secondary);padding:20px">لا توجد سجلات</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================
-       🛢️ تغيير الزيت
-  ====================================== -->
-  <section id="page-oil" class="page-section" style="display:none">
-    <div class="page-header">
-      <h2>🛢️ نموذج تغيير الزيت</h2>
-    </div>
-
-    <!-- تنبيهات الزيت -->
-    <div id="oilAlertsContainer" class="alerts-container"></div>
-
-    <div class="form-container">
-      <div class="form-title">🛢️ تسجيل تغيير الزيت</div>
-      <form onsubmit="submitOil(event)">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>التاريخ <span class="required">*</span></label>
-            <input type="date" id="o_date" required>
-          </div>
-          <div class="form-group">
-            <label>الوقت <span class="required">*</span></label>
-            <input type="time" id="o_time" required>
-          </div>
-          <div class="form-group">
-            <label>اسم مدخل البيانات <span class="required">*</span></label>
-            <input type="text" id="o_user" placeholder="اسم الموظف" required>
-          </div>
-          <div class="form-group">
-            <label>رقم اللوحة <span class="required">*</span></label>
-            <select id="o_plate" onchange="fillOilData(this.value)" required>
-              <option value="">-- اختر المركبة --</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="vehicle-info-card" id="o_vehicleInfo" style="display:none">
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">النوع</span>
-            <span class="vehicle-info-value" id="o_vType">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">الموديل</span>
-            <span class="vehicle-info-value" id="o_vModel">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">آخر تغيير زيت</span>
-            <span class="vehicle-info-value" id="o_lastChange">-</span>
-          </div>
-          <div class="vehicle-info-item">
-            <span class="vehicle-info-label">آخر قراءة عداد</span>
-            <span class="vehicle-info-value" id="o_lastKmDisplay">-</span>
-          </div>
-        </div>
-
-        <!-- مؤشر الزيت -->
-        <div id="oilIndicator" style="display:none;margin-bottom:15px">
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
-            <span id="oilIndicatorText">حالة الزيت</span>
-            <span id="oilIndicatorPct">0%</span>
-          </div>
-          <div class="oil-progress">
-            <div class="oil-progress-bar safe" id="oilProgressBar" style="width:0%"></div>
-          </div>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label>رقم الطلب <span class="required">*</span></label>
-            <input type="text" id="o_orderNum" placeholder="رقم طلب الزيت" required>
-          </div>
-          <div class="form-group">
-            <label>قراءة العداد الحالية (كم) <span class="required">*</span></label>
-            <input type="number" id="o_km" placeholder="أدخل قراءة العداد" required oninput="calcOilDiff()">
-          </div>
-          <div class="form-group">
-            <label>آخر قراءة للعداد (كم)</label>
-            <input type="number" id="o_lastKm" placeholder="تلقائي من السجل" readonly style="background:rgba(26,122,60,0.05)">
-          </div>
-          <div class="form-group">
-            <label>الفرق (كم)</label>
-            <input type="number" id="o_diff" placeholder="يحسب تلقائياً" readonly style="background:rgba(26,122,60,0.05)">
-          </div>
-          <div class="form-group full-width">
-            <label>ملاحظات</label>
-            <textarea id="o_notes" placeholder="ملاحظات إضافية..." rows="2"></textarea>
-          </div>
-        </div>
-        <button type="submit" class="btn-submit">🛢️ تسجيل تغيير الزيت</button>
-      </form>
-    </div>
-
-    <!-- سجل تغيير الزيت -->
-    <div class="table-container">
-      <div class="table-header">
-        <span class="table-title">📋 سجل تغيير الزيت</span>
-        <button class="btn btn-secondary btn-sm" onclick="loadOilRecords()">🔄 تحديث</button>
-      </div>
-      <div class="table-responsive records-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>التاريخ</th><th>الوقت</th><th>رقم اللوحة</th>
-              <th>النوع</th><th>الموديل</th><th>رقم الطلب</th>
-              <th>قراءة العداد</th><th>آخر قراءة</th><th>الفرق (كم)</th>
-              <th>حالة الزيت</th>
-            </tr>
-          </thead>
-          <tbody id="oilRecords">
-            <tr><td colspan="10" style="color:var(--text-secondary);padding:20px">لا توجد سجلات</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================
-       📈 التقارير
-  ====================================== -->
-  <section id="page-reports" class="page-section" style="display:none">
-    <div class="page-header">
-      <h2>📈 التقارير والإحصائيات</h2>
-      <div class="page-header-actions">
-        <button class="btn btn-danger btn-sm" onclick="exportFullReportPDF()">📄 تصدير PDF</button>
-      </div>
-    </div>
-
-    <!-- تبويبات التقارير -->
-    <div class="report-tabs">
-      <button class="report-tab active" onclick="switchReport('monthly', this)">📅 شهري</button>
-      <button class="report-tab" onclick="switchReport('quarterly', this)">📊 ربع سنوي</button>
-      <button class="report-tab" onclick="switchReport('annual', this)">📆 سنوي</button>
-    </div>
-
-    <div class="filter-bar">
-      <div class="filter-group">
-        <label>السنة</label>
-        <select id="rpt_year"></select>
-      </div>
-      <div class="filter-group" id="rpt_monthGroup">
-        <label>الشهر</label>
-        <select id="rpt_month">
-          <option value="1">يناير</option><option value="2">فبراير</option>
-          <option value="3">مارس</option><option value="4">أبريل</option>
-          <option value="5">مايو</option><option value="6">يونيو</option>
-          <option value="7">يوليو</option><option value="8">أغسطس</option>
-          <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
-          <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
-        </select>
-      </div>
-      <div class="filter-group" id="rpt_quarterGroup" style="display:none">
-        <label>الربع</label>
-        <select id="rpt_quarter">
-          <option value="1">الربع الأول</option>
-          <option value="2">الربع الثاني</option>
-          <option value="3">الربع الثالث</option>
-          <option value="4">الربع الرابع</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>&nbsp;</label>
-        <button class="btn btn-primary" onclick="generateReport()">📊 إنشاء التقرير</button>
-      </div>
-    </div>
-
-    <!-- ملخص التقرير -->
-    <div id="reportSummary" style="display:none">
-      <div class="stats-grid" id="reportStats"></div>
-      <div class="charts-grid">
-        <div class="chart-card">
-          <div class="chart-title">📊 الصيانة</div>
-          <canvas id="rptMaintChart" height="200"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">🚧 الحوادث</div>
-          <canvas id="rptAccChart" height="200"></canvas>
-        </div>
-      </div>
-
-      <div class="table-container">
-        <div class="table-header">
-          <span class="table-title" id="reportTableTitle">📋 تفاصيل التقرير</span>
-        </div>
-        <div class="table-responsive">
-          <table>
-            <thead id="reportTableHead"></thead>
-            <tbody id="reportTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<!-- ====== الشريط السفلي ====== -->
-<footer class="footer">
-  <span>👤 قائد الأسطول: ثامر عياد الحربي</span>
-  <span>💻 تطوير: علي 102459@srca</span>
-  <span>© تشغيل وصيانة الأسطول - منطقة الرياض</span>
-</footer>
-
-<!-- ====== مؤشر التحميل ====== -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-text" id="loadingText">جاري تحميل بيانات الأسطول...</div>
-</div>
-
-<!-- ====== إشعار ====== -->
-<div class="toast" id="toast"></div>
-
-<!-- ====== نافذة إعداد Google Sheets ====== -->
-<div class="settings-overlay" id="settingsOverlay" style="display:none">
-  <div class="settings-modal">
-    <div class="settings-header">
-      <div class="settings-icon">⚙️</div>
-      <h2>ربط Google Sheets</h2>
-      <p>أدخل رابط Google Apps Script لتفعيل حفظ البيانات</p>
-    </div>
-    <div class="settings-body">
-      <label>رابط Web App URL</label>
-      <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/..." />
-      <div class="settings-hint">
-        <strong>كيفية الحصول على الرابط:</strong><br>
-        1. افتح Google Sheets ← الإضافات ← Apps Script<br>
-        2. الصق الكود من ملف google-apps-script.js<br>
-        3. نشر ← نشر كتطبيق ويب ← انسخ الرابط<br>
-        4. الصق الرابط هنا واضغط حفظ
-      </div>
-    </div>
-    <div class="settings-footer">
-      <button class="btn-save-script" onclick="saveScriptUrl()">💾 حفظ وتفعيل</button>
-      <button class="btn-skip-script" onclick="skipScriptSetup()">تخطي (وضع تجريبي)</button>
+<!-- ==========================================
+     📊 لوحة القائد
+=========================================== -->
+<section id="قسم_لوحة_القائد" class="قسم-محتوى نشط">
+  <div class="رأس-الصفحة">
+    <h2>📊 لوحة القائد</h2>
+    <div class="أزرار-رأس-الصفحة">
+      <button class="زر زر-ثانوي" onclick="تحديث_الصفحة()">🔄 تحديث</button>
+      <button class="زر زر-تصدير" onclick="تصدير_PDF()">📄 تصدير PDF</button>
     </div>
   </div>
+
+  <!-- فلتر التقارير -->
+  <div class="شريط-فلتر">
+    <div class="مجموعة-فلتر">
+      <label>نوع التقرير</label>
+      <select id="نوع_التقرير_لوحة" onchange="تغيير_نوع_التقرير()">
+        <option value="شهري">شهري</option>
+        <option value="ربع سنوي">ربع سنوي</option>
+        <option value="سنوي">سنوي</option>
+      </select>
+    </div>
+    <div class="مجموعة-فلتر" id="مجموعة_الشهر_لوحة">
+      <label>الشهر</label>
+      <select id="شهر_لوحة">
+        <option value="1">يناير</option><option value="2">فبراير</option>
+        <option value="3">مارس</option><option value="4">أبريل</option>
+        <option value="5">مايو</option><option value="6">يونيو</option>
+        <option value="7">يوليو</option><option value="8">أغسطس</option>
+        <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
+        <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+      </select>
+    </div>
+    <div class="مجموعة-فلتر" id="مجموعة_الربع_لوحة" style="display:none">
+      <label>الربع</label>
+      <select id="ربع_لوحة">
+        <option value="Q1">الربع الأول (يناير-مارس)</option>
+        <option value="Q2">الربع الثاني (أبريل-يونيو)</option>
+        <option value="Q3">الربع الثالث (يوليو-سبتمبر)</option>
+        <option value="Q4">الربع الرابع (أكتوبر-ديسمبر)</option>
+      </select>
+    </div>
+    <div class="مجموعة-فلتر">
+      <label>السنة</label>
+      <select id="سنة_لوحة" data-نوع="سنة"></select>
+    </div>
+  </div>
+
+  <!-- التنبيهات -->
+  <div class="حاوية-تنبيهات" id="تنبيهات_لوحة_القائد"></div>
+
+  <!-- بطاقات الإحصاء -->
+  <div class="شبكة-احصاء">
+    <div class="بطاقة-احصاء أزرق">
+      <div class="أيقونة-احصاء">🚑</div>
+      <div class="قيمة-احصاء" id="إجمالي_الأسطول">397</div>
+      <div class="تسمية-احصاء">إجمالي الأسطول</div>
+    </div>
+    <div class="بطاقة-احصاء أخضر">
+      <div class="أيقونة-احصاء">✅</div>
+      <div class="قيمة-احصاء" id="مركبات_جاهزة">0</div>
+      <div class="تسمية-احصاء">مركبات جاهزة</div>
+    </div>
+    <div class="بطاقة-احصاء أصفر">
+      <div class="أيقونة-احصاء">🔧</div>
+      <div class="قيمة-احصاء" id="تحت_الصيانة">0</div>
+      <div class="تسمية-احصاء">تحت الصيانة</div>
+    </div>
+    <div class="بطاقة-احصاء أحمر">
+      <div class="أيقونة-احصاء">❌</div>
+      <div class="قيمة-احصاء" id="خارج_الخدمة">0</div>
+      <div class="تسمية-احصاء">خارج الخدمة</div>
+    </div>
+    <div class="بطاقة-احصاء برتقالي">
+      <div class="أيقونة-احصاء">🚧</div>
+      <div class="قيمة-احصاء" id="حوادث_مسجلة">0</div>
+      <div class="تسمية-احصاء">حوادث مسجلة</div>
+    </div>
+    <div class="بطاقة-احصاء أصفر">
+      <div class="أيقونة-احصاء">⏳</div>
+      <div class="قيمة-احصاء" id="طلبات_معلقة">0</div>
+      <div class="تسمية-احصاء">طلبات معلقة</div>
+    </div>
+    <div class="بطاقة-احصاء أحمر">
+      <div class="أيقونة-احصاء">🛢️</div>
+      <div class="قيمة-احصاء" id="تنبيهات_الزيت">0</div>
+      <div class="تسمية-احصاء">تنبيهات الزيت</div>
+    </div>
+  </div>
+
+  <!-- الرسوم البيانية -->
+  <div class="شبكة-رسوم">
+    <div class="بطاقة-رسم">
+      <div class="عنوان-رسم">📊 توزيع حالات الأسطول</div>
+      <canvas id="رسم_حالة_الاسطول" height="200"></canvas>
+    </div>
+    <div class="بطاقة-رسم">
+      <div class="عنوان-رسم">📈 الصيانة الشهرية</div>
+      <canvas id="رسم_الصيانة_الشهري" height="200"></canvas>
+    </div>
+    <div class="بطاقة-رسم">
+      <div class="عنوان-رسم">🚧 الحوادث الشهرية</div>
+      <canvas id="رسم_الحوادث_الشهري" height="200"></canvas>
+    </div>
+    <div class="بطاقة-رسم">
+      <div class="عنوان-رسم">🛢️ إحصائيات تغيير الزيت</div>
+      <canvas id="رسم_الزيت_الاحصائي" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- تنبيهات الزيت -->
+  <div class="حاوية-جدول">
+    <div class="رأس-جدول">
+      <span class="عنوان-جدول">🛢️ تنبيهات تغيير الزيت</span>
+      <button class="زر زر-ثانوي" onclick="فحص_تنبيهات_الزيت()">🔄 تحديث</button>
+    </div>
+    <div id="قائمة_تنبيهات_الزيت" style="padding:10px">
+      <div class="لا-تنبيهات">جاري التحقق من التنبيهات...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     🚑 الأسطول
+=========================================== -->
+<section id="قسم_الأسطول" class="قسم-محتوى">
+  <div class="رأس-الصفحة">
+    <h2>🚑 شيت الأسطول</h2>
+    <div class="أزرار-رأس-الصفحة">
+      <span id="عداد_الاسطول" style="font-size:12px;color:var(--نص-رمادي)"></span>
+      <button class="زر زر-تصدير" onclick="window.print()">📄 طباعة</button>
+    </div>
+  </div>
+
+  <div class="شريط-فلتر">
+    <div class="مجموعة-فلتر">
+      <label>بحث</label>
+      <input type="text" id="بحث_الاسطول" placeholder="رقم اللوحة، النوع، الموديل..." oninput="تصفية_الاسطول()">
+    </div>
+    <div class="مجموعة-فلتر">
+      <label>القطاع</label>
+      <select id="فلتر_القطاع" onchange="تصفية_الاسطول()">
+        <option value="">الكل</option>
+      </select>
+    </div>
+    <div class="مجموعة-فلتر">
+      <label>الحالة</label>
+      <select id="فلتر_الحالة" onchange="تصفية_الاسطول()">
+        <option value="">الكل</option>
+        <option value="عاملة">عاملة</option>
+        <option value="صيانة">صيانة</option>
+        <option value="خارج الخدمة">خارج الخدمة</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="حاوية-جدول">
+    <div class="جدول-متجاوب">
+      <table id="جدول_الاسطول">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>رقم اللوحة</th>
+            <th>النوع</th>
+            <th>الموديل</th>
+            <th>رقم الشاصي</th>
+            <th>القطاع</th>
+            <th>المركز</th>
+            <th>الحالة</th>
+            <th>آخر قراءة عداد</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="9" style="padding:30px;color:var(--نص-رمادي)">جاري تحميل البيانات...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     📍 رصد المركبات
+=========================================== -->
+<section id="قسم_الرصد" class="قسم-محتوى">
+  <div class="رأس-الصفحة">
+    <h2>📍 نموذج رصد المركبات</h2>
+  </div>
+
+  <div class="حاوية-نموذج">
+    <div class="عنوان-نموذج">📍 تسجيل موقع وحركة المركبة</div>
+    <form id="نموذج_الرصد" onsubmit="حفظ_رصد(event)">
+      <div class="شبكة-نموذج">
+        <div class="مجموعة-حقل">
+          <label>التاريخ <span class="مطلوب">*</span></label>
+          <input type="date" id="رصد_تاريخ" required>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>الوقت <span class="مطلوب">*</span></label>
+          <input type="time" id="رصد_وقت" required>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>رقم اللوحة <span class="مطلوب">*</span></label>
+          <select id="رصد_لوحة" data-نوع="لوحة" onchange="عند_اختيار_لوحة(this.value,'رصد')" required>
+            <option value="">-- اختر رقم اللوحة --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>قراءة العداد (كم)</label>
+          <input type="number" id="رصد_عداد" placeholder="أدخل قراءة العداد">
+        </div>
+      </div>
+
+      <div class="بطاقة-معلومات-مركبة" id="رصد_بطاقة_المركبة" style="display:none">
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">النوع</span>
+          <span class="قيمة-معلومات" id="رصد_نوع_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">الموديل</span>
+          <span class="قيمة-معلومات" id="رصد_موديل_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">رقم الشاصي</span>
+          <span class="قيمة-معلومات" id="رصد_شاصي_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">الحالة</span>
+          <span class="قيمة-معلومات" id="رصد_حالة_عرض">-</span>
+        </div>
+      </div>
+
+      <div class="شبكة-نموذج">
+        <div class="مجموعة-حقل">
+          <label>القطاع <span class="مطلوب">*</span></label>
+          <select id="رصد_قطاع" data-نوع="قطاع" onchange="تحديث_المراكز('رصد_قطاع','رصد_مركز')" required>
+            <option value="">-- اختر القطاع --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>المركز <span class="مطلوب">*</span></label>
+          <select id="رصد_مركز" required>
+            <option value="">-- اختر المركز --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>الموقع الحالي <span class="مطلوب">*</span></label>
+          <input type="text" id="رصد_موقع" placeholder="أدخل موقع المركبة" required>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>حالة المركبة <span class="مطلوب">*</span></label>
+          <select id="رصد_حالة" required>
+            <option value="عاملة">✅ عاملة</option>
+            <option value="خارج الخدمة">❌ خارج الخدمة</option>
+            <option value="صيانة">🔧 صيانة</option>
+            <option value="في مهمة">🚑 في مهمة</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل عرض-كامل">
+          <label>ملاحظات</label>
+          <textarea id="رصد_ملاحظات" rows="2" placeholder="أي ملاحظات إضافية..."></textarea>
+        </div>
+      </div>
+      <input type="hidden" id="رصد_نوع">
+      <input type="hidden" id="رصد_موديل">
+      <input type="hidden" id="رصد_شاصي">
+      <button type="submit" class="زر-حفظ">📍 حفظ بيانات الرصد</button>
+    </form>
+  </div>
+</section>
+
+<!-- ==========================================
+     🚧 الحوادث
+=========================================== -->
+<section id="قسم_الحوادث" class="قسم-محتوى">
+  <div class="رأس-الصفحة">
+    <h2>🚧 نموذج تسجيل الحوادث</h2>
+  </div>
+
+  <div class="حاوية-نموذج">
+    <div class="عنوان-نموذج">🚧 بيانات الحادث</div>
+    <form id="نموذج_الحوادث" onsubmit="حفظ_حادث(event)">
+      <div class="شبكة-نموذج">
+        <div class="مجموعة-حقل">
+          <label>التاريخ <span class="مطلوب">*</span></label>
+          <input type="date" id="حادث_تاريخ" required>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>الوقت <span class="مطلوب">*</span></label>
+          <input type="time" id="حادث_وقت" required>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>رقم اللوحة <span class="مطلوب">*</span></label>
+          <select id="حادث_لوحة" data-نوع="لوحة" onchange="عند_اختيار_لوحة(this.value,'حادث')" required>
+            <option value="">-- اختر رقم اللوحة --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>نوع الحادث <span class="مطلوب">*</span></label>
+          <select id="حادث_النوع" required>
+            <option value="">-- اختر --</option>
+            <option value="تصادم">تصادم</option>
+            <option value="انقلاب">انقلاب</option>
+            <option value="حريق">حريق</option>
+            <option value="سرقة">سرقة</option>
+            <option value="تلف ميكانيكي">تلف ميكانيكي</option>
+            <option value="حادث طرق">حادث طرق</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="بطاقة-معلومات-مركبة" id="حادث_بطاقة_المركبة" style="display:none">
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">النوع</span>
+          <span class="قيمة-معلومات" id="حادث_نوع_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">الموديل</span>
+          <span class="قيمة-معلومات" id="حادث_موديل_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">رقم الشاصي</span>
+          <span class="قيمة-معلومات" id="حادث_شاصي_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">الحالة</span>
+          <span class="قيمة-معلومات" id="حادث_حالة_عرض">-</span>
+        </div>
+      </div>
+
+      <div class="شبكة-نموذج">
+        <div class="مجموعة-حقل">
+          <label>القطاع <span class="مطلوب">*</span></label>
+          <select id="حادث_قطاع" data-نوع="قطاع" onchange="تحديث_المراكز('حادث_قطاع','حادث_مركز')" required>
+            <option value="">-- اختر القطاع --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>المركز <span class="مطلوب">*</span></label>
+          <select id="حادث_مركز" required>
+            <option value="">-- اختر المركز --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل عرض-كامل">
+          <label>وصف الحادث <span class="مطلوب">*</span></label>
+          <textarea id="حادث_وصف" rows="3" placeholder="وصف تفصيلي للحادث..." required></textarea>
+        </div>
+        <div class="مجموعة-حقل عرض-كامل">
+          <label>الأضرار</label>
+          <textarea id="حادث_اضرار" rows="2" placeholder="وصف الأضرار المادية..."></textarea>
+        </div>
+      </div>
+      <input type="hidden" id="حادث_نوع">
+      <input type="hidden" id="حادث_موديل">
+      <input type="hidden" id="حادث_شاصي">
+      <button type="submit" class="زر-حفظ">🚧 تسجيل الحادث</button>
+    </form>
+  </div>
+
+  <!-- سجل الحوادث -->
+  <div class="حاوية-جدول">
+    <div class="رأس-جدول">
+      <span class="عنوان-جدول">📋 سجل الحوادث</span>
+      <button class="زر زر-ثانوي" onclick="تحديث_جدول_الحوادث()">🔄 تحديث</button>
+    </div>
+    <div class="جدول-متجاوب">
+      <table id="جدول_الحوادث">
+        <thead>
+          <tr>
+            <th>رقم الطلب</th><th>التاريخ</th><th>رقم اللوحة</th>
+            <th>نوع الحادث</th><th>القطاع</th><th>الحالة</th><th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="7" style="padding:20px;color:var(--نص-رمادي)">لا توجد سجلات</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     🔧 الصيانة الوقائية
+=========================================== -->
+<section id="قسم_الصيانة" class="قسم-محتوى">
+  <div class="رأس-الصفحة">
+    <h2>🔧 نموذج الصيانة الوقائية</h2>
+  </div>
+
+  <div class="حاوية-نموذج">
+    <div class="عنوان-نموذج">🔧 كرت الصيانة الوقائية</div>
+    <form id="نموذج_الصيانة" onsubmit="حفظ_صيانة(event)">
+      <div class="شبكة-نموذج">
+        <div class="مجموعة-حقل">
+          <label>التاريخ <span class="مطلوب">*</span></label>
+          <input type="date" id="صيانة_تاريخ" required>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>رقم اللوحة <span class="مطلوب">*</span></label>
+          <select id="صيانة_لوحة" data-نوع="لوحة" onchange="عند_اختيار_لوحة(this.value,'صيانة')" required>
+            <option value="">-- اختر رقم اللوحة --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>قراءة العداد (كم)</label>
+          <input type="number" id="صيانة_عداد" placeholder="قراءة العداد الحالية">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>التكلفة التقديرية (ريال)</label>
+          <input type="number" id="صيانة_تكلفة" placeholder="التكلفة التقديرية">
+        </div>
+      </div>
+
+      <div class="بطاقة-معلومات-مركبة" id="صيانة_بطاقة_المركبة" style="display:none">
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">النوع</span>
+          <span class="قيمة-معلومات" id="صيانة_نوع_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">الموديل</span>
+          <span class="قيمة-معلومات" id="صيانة_موديل_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">رقم الشاصي</span>
+          <span class="قيمة-معلومات" id="صيانة_شاصي_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">الحالة</span>
+          <span class="قيمة-معلومات" id="صيانة_حالة_عرض">-</span>
+        </div>
+      </div>
+
+      <div class="شبكة-نموذج">
+        <div class="مجموعة-حقل">
+          <label>القطاع <span class="مطلوب">*</span></label>
+          <select id="صيانة_قطاع" data-نوع="قطاع" onchange="تحديث_المراكز('صيانة_قطاع','صيانة_مركز')" required>
+            <option value="">-- اختر القطاع --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>المركز <span class="مطلوب">*</span></label>
+          <select id="صيانة_مركز" required>
+            <option value="">-- اختر المركز --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>نوع العطل <span class="مطلوب">*</span></label>
+          <select id="صيانة_نوع_عطل" required>
+            <option value="">-- اختر --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>وصف العطل <span class="مطلوب">*</span></label>
+          <select id="صيانة_وصف_عطل" required>
+            <option value="">-- اختر --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>الفني المسؤول <span class="مطلوب">*</span></label>
+          <select id="صيانة_فني" data-نوع="فني" required>
+            <option value="">-- اختر الفني --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>قطع الغيار</label>
+          <select id="صيانة_قطع_غيار">
+            <option value="">-- اختر --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل عرض-كامل">
+          <label>ملاحظات</label>
+          <textarea id="صيانة_ملاحظات" rows="2" placeholder="ملاحظات إضافية..."></textarea>
+        </div>
+      </div>
+      <input type="hidden" id="صيانة_نوع">
+      <input type="hidden" id="صيانة_موديل">
+      <input type="hidden" id="صيانة_شاصي">
+      <button type="submit" class="زر-حفظ">🔧 حفظ كرت الصيانة</button>
+    </form>
+  </div>
+
+  <!-- سجل الصيانة -->
+  <div class="حاوية-جدول">
+    <div class="رأس-جدول">
+      <span class="عنوان-جدول">📋 سجل الصيانة الوقائية</span>
+      <button class="زر زر-ثانوي" onclick="تحديث_جدول_الصيانة()">🔄 تحديث</button>
+    </div>
+    <div class="جدول-متجاوب">
+      <table id="جدول_الصيانة">
+        <thead>
+          <tr>
+            <th>رقم الطلب</th><th>التاريخ</th><th>رقم اللوحة</th>
+            <th>نوع العطل</th><th>الفني</th><th>حالة الإنجاز</th><th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="7" style="padding:20px;color:var(--نص-رمادي)">لا توجد سجلات</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     🛢️ تغيير الزيت
+=========================================== -->
+<section id="قسم_الزيت" class="قسم-محتوى">
+  <div class="رأس-الصفحة">
+    <h2>🛢️ نموذج تغيير الزيت</h2>
+  </div>
+
+  <div class="حاوية-نموذج">
+    <div class="عنوان-نموذج">🛢️ تسجيل تغيير الزيت</div>
+    <form id="نموذج_تغيير_الزيت" onsubmit="حفظ_تغيير_زيت(event)">
+      <div class="شبكة-نموذج">
+        <div class="مجموعة-حقل">
+          <label>التاريخ <span class="مطلوب">*</span></label>
+          <input type="date" id="زيت_تاريخ" required>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>رقم اللوحة <span class="مطلوب">*</span></label>
+          <select id="زيت_لوحة" data-نوع="لوحة" onchange="عند_اختيار_لوحة(this.value,'زيت')" required>
+            <option value="">-- اختر رقم اللوحة --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>قراءة العداد الحالية (كم) <span class="مطلوب">*</span></label>
+          <input type="number" id="زيت_عداد" placeholder="أدخل قراءة العداد" required>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>نوع الزيت <span class="مطلوب">*</span></label>
+          <select id="زيت_النوع" required>
+            <option value="">-- اختر --</option>
+            <option value="5W-30">5W-30</option>
+            <option value="5W-40">5W-40</option>
+            <option value="10W-30">10W-30</option>
+            <option value="10W-40">10W-40</option>
+            <option value="15W-40">15W-40</option>
+            <option value="0W-20">0W-20</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="بطاقة-معلومات-مركبة" id="زيت_بطاقة_المركبة" style="display:none">
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">النوع</span>
+          <span class="قيمة-معلومات" id="زيت_نوع_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">الموديل</span>
+          <span class="قيمة-معلومات" id="زيت_موديل_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">آخر تغيير زيت</span>
+          <span class="قيمة-معلومات" id="زيت_آخر_تغيير">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">آخر قراءة عداد</span>
+          <span class="قيمة-معلومات" id="زيت_آخر_قراءة">-</span>
+        </div>
+      </div>
+
+      <!-- مؤشر الزيت -->
+      <div class="مؤشر-زيت" id="مؤشر_الزيت" style="display:none">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+          <span id="نص_مؤشر_الزيت">حالة الزيت</span>
+          <span id="نسبة_مؤشر_الزيت">0%</span>
+        </div>
+        <div class="شريط-تقدم-زيت">
+          <div class="شريط-تقدم-داخلي آمن" id="شريط_الزيت" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="شبكة-نموذج">
+        <div class="مجموعة-حقل">
+          <label>القطاع <span class="مطلوب">*</span></label>
+          <select id="زيت_قطاع" data-نوع="قطاع" onchange="تحديث_المراكز('زيت_قطاع','زيت_مركز')" required>
+            <option value="">-- اختر القطاع --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>المركز <span class="مطلوب">*</span></label>
+          <select id="زيت_مركز" required>
+            <option value="">-- اختر المركز --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>الفني المسؤول <span class="مطلوب">*</span></label>
+          <select id="زيت_فني" data-نوع="فني" required>
+            <option value="">-- اختر الفني --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل عرض-كامل">
+          <label>ملاحظات</label>
+          <textarea id="زيت_ملاحظات" rows="2" placeholder="ملاحظات إضافية..."></textarea>
+        </div>
+      </div>
+      <input type="hidden" id="زيت_نوع">
+      <input type="hidden" id="زيت_موديل">
+      <input type="hidden" id="زيت_شاصي">
+      <button type="submit" class="زر-حفظ">🛢️ تسجيل تغيير الزيت</button>
+    </form>
+  </div>
+
+  <!-- سجل تغيير الزيت -->
+  <div class="حاوية-جدول">
+    <div class="رأس-جدول">
+      <span class="عنوان-جدول">📋 سجل تغيير الزيت</span>
+      <button class="زر زر-ثانوي" onclick="تحديث_جدول_تغيير_الزيت()">🔄 تحديث</button>
+    </div>
+    <div class="جدول-متجاوب">
+      <table id="جدول_تغيير_الزيت">
+        <thead>
+          <tr>
+            <th>رقم الطلب</th><th>التاريخ</th><th>رقم اللوحة</th>
+            <th>القطاع</th><th>قراءة العداد</th>
+            <th>الموعد القادم (كم)</th><th>الموعد القادم (تاريخ)</th>
+            <th>الفني</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="8" style="padding:20px;color:var(--نص-رمادي)">لا توجد سجلات</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     📈 التقارير
+=========================================== -->
+<section id="قسم_التقارير" class="قسم-محتوى">
+  <div class="رأس-الصفحة">
+    <h2>📈 التقارير والإحصائيات</h2>
+    <div class="أزرار-رأس-الصفحة">
+      <button class="زر زر-تصدير" onclick="تصدير_PDF()">📄 تصدير PDF</button>
+    </div>
+  </div>
+
+  <div class="تبويبات-تقرير">
+    <button class="تبويب-تقرير نشط" onclick="تغيير_نوع_تقرير_صفحة('شهري',this)">📅 شهري</button>
+    <button class="تبويب-تقرير" onclick="تغيير_نوع_تقرير_صفحة('ربع سنوي',this)">📊 ربع سنوي</button>
+    <button class="تبويب-تقرير" onclick="تغيير_نوع_تقرير_صفحة('سنوي',this)">📆 سنوي</button>
+  </div>
+
+  <div class="شريط-فلتر">
+    <div class="مجموعة-فلتر">
+      <label>السنة</label>
+      <select id="سنة_التقرير" data-نوع="سنة"></select>
+    </div>
+    <div class="مجموعة-فلتر" id="مجموعة_شهر_التقرير">
+      <label>الشهر</label>
+      <select id="شهر_التقرير">
+        <option value="1">يناير</option><option value="2">فبراير</option>
+        <option value="3">مارس</option><option value="4">أبريل</option>
+        <option value="5">مايو</option><option value="6">يونيو</option>
+        <option value="7">يوليو</option><option value="8">أغسطس</option>
+        <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
+        <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+      </select>
+    </div>
+    <div class="مجموعة-فلتر" id="مجموعة_ربع_التقرير" style="display:none">
+      <label>الربع</label>
+      <select id="ربع_التقرير">
+        <option value="Q1">الربع الأول (يناير-مارس)</option>
+        <option value="Q2">الربع الثاني (أبريل-يونيو)</option>
+        <option value="Q3">الربع الثالث (يوليو-سبتمبر)</option>
+        <option value="Q4">الربع الرابع (أكتوبر-ديسمبر)</option>
+      </select>
+    </div>
+    <div class="مجموعة-فلتر">
+      <label>&nbsp;</label>
+      <button class="زر زر-رئيسي" onclick="توليد_التقرير()">📊 إنشاء التقرير</button>
+    </div>
+  </div>
+
+  <div id="محتوى_التقرير"></div>
+</section>
+
+</main>
 </div>
 
-<!-- ====== زر الإعدادات الدائم ====== -->
-<button class="settings-fab" id="settingsFab" onclick="openSettings()" title="إعدادات الربط">⚙️</button>
-
-<script src="data.js?v=3.0"></script>
-<!-- CONFIG: رابط Google Apps Script - يتم تحديثه هنا -->
+<!-- ====== السكريبتات ====== -->
+<script src="data.js?v=4.0"></script>
 <script>
-var CONFIG = {
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyDFRlRvIi_uRMZvcTF365ncbQ4AVFU0iD9kNMmbRMhZZ_TSPNDVCAlpWZ_uOLQCgs/exec'
-};
+// رابط Google Apps Script - يتم تحديثه هنا
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDFRlRvIi_uRMZvcTF365ncbQ4AVFU0iD9kNMmbRMhZZ_TSPNDVCAlpWZ_uOLQCgs/exec';
+
+// دوال مساعدة إضافية
+function تغيير_نوع_التقرير() {
+  var نوع = document.getElementById('نوع_التقرير_لوحة').value;
+  document.getElementById('مجموعة_الشهر_لوحة').style.display = نوع === 'شهري' ? '' : 'none';
+  document.getElementById('مجموعة_الربع_لوحة').style.display = نوع === 'ربع سنوي' ? '' : 'none';
+}
+
+function تغيير_نوع_تقرير_صفحة(نوع, زر) {
+  document.querySelectorAll('.تبويب-تقرير').forEach(function(ت) { ت.classList.remove('نشط'); });
+  زر.classList.add('نشط');
+  document.getElementById('مجموعة_شهر_التقرير').style.display = نوع === 'شهري' ? '' : 'none';
+  document.getElementById('مجموعة_ربع_التقرير').style.display = نوع === 'ربع سنوي' ? '' : 'none';
+  // تخزين النوع الحالي
+  window._نوع_التقرير_الحالي = نوع;
+}
+
+window._نوع_التقرير_الحالي = 'شهري';
+
+// تجاوز دالة توليد_التقرير لاستخدام النوع الصحيح
+var _توليد_التقرير_الأصلي = null;
+window.addEventListener('DOMContentLoaded', function() {
+  _توليد_التقرير_الأصلي = window.توليد_التقرير;
+  window.توليد_التقرير = function() {
+    var نوع = window._نوع_التقرير_الحالي || 'شهري';
+    var نوع_el = document.getElementById('نوع_التقرير');
+    if (!نوع_el) {
+      // إنشاء عنصر مخفي
+      var el = document.createElement('select');
+      el.id = 'نوع_التقرير';
+      el.style.display = 'none';
+      el.innerHTML = '<option value="' + نوع + '">' + نوع + '</option>';
+      document.body.appendChild(el);
+    } else {
+      نوع_el.value = نوع;
+    }
+    if (_توليد_التقرير_الأصلي) _توليد_التقرير_الأصلي();
+  };
+});
 </script>
-<script src="app.js?v=3.0"></script>
+<script src="app.js?v=4.0"></script>
 </body>
 </html>
