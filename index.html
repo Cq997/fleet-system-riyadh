@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>منصة صيانة وتشغيل الأسطول |  - منطقة الرياض</title>
+<title>منصة صيانة وتشغيل الأسطول | هيئة الهلال الأحمر السعودي - منطقة الرياض</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -248,15 +248,100 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
   body { background:#fff; color:#000; }
 }
 
-/* ====== الجوال ====== */
+/* ====== تصميم متجاوب - كمبيوتر كبير ====== */
+@media (min-width:1200px) {
+  .شبكة-نموذج { grid-template-columns:repeat(3,1fr); }
+  .شبكة-احصاء { grid-template-columns:repeat(5,1fr); }
+  .شبكة-رسوم { grid-template-columns:repeat(3,1fr); }
+}
+
+/* ====== تصميم متجاوب - تابلت ====== */
+@media (max-width:1024px) and (min-width:769px) {
+  .شريط-جانبي { width:220px; }
+  .شبكة-نموذج { grid-template-columns:repeat(2,1fr); }
+  .شبكة-احصاء { grid-template-columns:repeat(3,1fr); }
+  .شبكة-رسوم { grid-template-columns:repeat(2,1fr); }
+}
+
+/* ====== تصميم متجاوب - جوال ====== */
 @media (max-width:768px) {
-  .شريط-جانبي { position:fixed; right:-260px; height:100vh; }
+  /* الشريط الجانبي */
+  .شريط-جانبي {
+    position:fixed; right:-280px; height:100vh;
+    width:280px; z-index:150;
+    box-shadow:-5px 0 20px rgba(0,0,0,0.5);
+  }
   .شريط-جانبي.مفتوحة { right:0; }
   .طبقة-شريط-جانبي { display:block; }
   .زر-قائمة-جوال { display:block; }
   .محتوى-رئيسي { margin-right:0 !important; }
-  .قسم-محتوى { padding:15px; padding-top:55px; }
-  .شبكة-احصاء { grid-template-columns:repeat(2,1fr); }
+
+  /* المحتوى الرئيسي */
+  .قسم-محتوى { padding:12px; padding-top:60px; }
+
+  /* رأس الصفحة */
+  .رأس-الصفحة { flex-direction:column; align-items:flex-start; gap:8px; }
+  .رأس-الصفحة h2 { font-size:16px; }
+  .أزرار-رأس-الصفحة { width:100%; justify-content:flex-start; }
+  .أزرار-رأس-الصفحة .'زر' { flex:1; justify-content:center; font-size:11px; padding:7px 10px; }
+
+  /* بطاقات الإحصاء */
+  .شبكة-احصاء { grid-template-columns:repeat(2,1fr); gap:10px; }
+  .بطاقة-احصاء { padding:12px; }
+  .قيمة-احصاء { font-size:22px; }
+  .أيقونة-احصاء { font-size:22px; }
+
+  /* النماذج */
+  .شبكة-نموذج { grid-template-columns:1fr; gap:12px; }
+  .مجموعة-حقل.عرض-كامل { grid-column:1; }
+  .مجموعة-حقل input,
+  .مجموعة-حقل select,
+  .مجموعة-حقل textarea { font-size:14px; padding:10px 12px; }
+  .زر-حفظ { font-size:14px; padding:13px; }
+
+  /* الجداول */
+  .جدول-متجاوب { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table { min-width:600px; }
+  thead th { font-size:10px; padding:8px 6px; }
+  tbody td { font-size:11px; padding:7px 6px; }
+
+  /* شريط الفلتر */
+  .شريط-فلتر { flex-direction:column; gap:10px; }
+  .مجموعة-فلتر { min-width:unset; width:100%; }
+
+  /* الرسوم البيانية */
+  .شبكة-رسوم { grid-template-columns:1fr; }
+
+  /* بطاقة معلومات المركبة */
+  .بطاقة-معلومات-مركبة { grid-template-columns:repeat(2,1fr); }
+
+  /* رأس الجدول */
+  .رأس-جدول { flex-direction:column; align-items:flex-start; }
+
+  /* التقارير */
+  .تبويبات-تقرير { gap:5px; }
+  .تبويب-تقرير { padding:6px 12px; font-size:11px; }
+  .شبكة-احصائيات-التقرير { grid-template-columns:repeat(2,1fr); }
+
+  /* التنبيهات */
+  #حاوية_الرسائل { left:10px; right:10px; max-width:unset; }
+
+  /* لوحة القائد */
+  .رأس-تقرير { flex-direction:column; text-align:center; }
+  .شعار-تقرير { font-size:35px; }
+}
+
+/* ====== جوال صغير ====== */
+@media (max-width:480px) {
+  .شبكة-احصاء { grid-template-columns:1fr 1fr; }
+  .بطاقة-احصاء { padding:10px 8px; }
+  .قيمة-احصاء { font-size:20px; }
+  .تسمية-احصاء { font-size:10px; }
+  .زر-قائمة-جوال { top:10px; right:10px; padding:7px 10px; }
+  .قسم-محتوى { padding:10px; padding-top:55px; }
+  .حاوية-نموذج { padding:15px; }
+  .عنوان-نموذج { font-size:13px; }
+  .زر { font-size:11px; padding:6px 10px; }
 }
 </style>
 </head>
@@ -280,8 +365,8 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
 <!-- ====== الشريط الجانبي ====== -->
 <aside class="شريط-جانبي" id="القائمة_الجانبية">
   <div class="رأس-الشريط">
-    <div class="شعار-الشريط">🚑</div>
-    <div class="عنوان-الشريط"> الشؤون الهندسية وسلاسل الامداد</div>
+    <div class="شعار-الشريط">🌙</div>
+    <div class="عنوان-الشريط">هيئة الهلال الأحمر السعودي</div>
     <div class="عنوان-فرعي-الشريط">منصة صيانة وتشغيل الأسطول<br>منطقة الرياض</div>
   </div>
   <nav class="قائمة-التنقل">
@@ -640,6 +725,23 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
             <option value="سرقة">سرقة</option>
             <option value="تلف ميكانيكي">تلف ميكانيكي</option>
             <option value="حادث طرق">حادث طرق</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>رقم التقرير</label>
+          <input type="text" id="حادث_رقم_تقرير" placeholder="مثال: RPT-2026-001">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>الجهة المصدرة للتقرير</label>
+          <select id="حادث_جهة_تقرير">
+            <option value="">-- اختر الجهة --</option>
+            <option value="المرور">المرور</option>
+            <option value="الدفاع المدني">الدفاع المدني</option>
+            <option value="الشرطة">الشرطة</option>
+            <option value="هيئة الهلال الأحمر السعودي">هيئة الهلال الأحمر السعودي</option>
+            <option value="شركة التأمين">شركة التأمين</option>
+            <option value="الجهة المشغلة">الجهة المشغلة</option>
             <option value="أخرى">أخرى</option>
           </select>
         </div>
