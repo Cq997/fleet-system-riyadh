@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>منصة صيانة وتشغيل الأسطول | هيئة الهلال الأحمر السعودي - منطقة الرياض</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚑</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="style.css?v=4.0">
@@ -401,8 +401,8 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
 <!-- ====== الشريط الجانبي ====== -->
 <aside class="شريط-جانبي" id="القائمة_الجانبية">
   <div class="رأس-الشريط">
-    <div class="شعار-الشريط">🚑</div>
-    <div class="عنوان-الشريط">الشؤون الهندسية وسلاسل الإمداد</div>
+    <div class="شعار-الشريط">🌙</div>
+    <div class="عنوان-الشريط">هيئة الهلال الأحمر السعودي</div>
     <div class="عنوان-فرعي-الشريط">منصة صيانة وتشغيل الأسطول<br>منطقة الرياض</div>
   </div>
   <nav class="قائمة-التنقل">
@@ -701,8 +701,8 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
           </select>
         </div>
         <div class="مجموعة-حقل">
-          <label>المركز <span class="مطلوب">*</span></label>
-          <select id="رصد_مركز" required>
+          <label>المركز <span style="color:var(--نص-رمادي);font-size:0.8em">(اختياري)</span></label>
+          <select id="رصد_مركز">
             <option value="">-- اختر المركز --</option>
           </select>
         </div>
@@ -787,8 +787,11 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
           <select id="حادث_جهة_تقرير">
             <option value="">-- اختر الجهة --</option>
             <option value="المرور">المرور</option>
-            <option value="نجم">نجم</option>
+            <option value="الدفاع المدني">الدفاع المدني</option>
             <option value="الشرطة">الشرطة</option>
+            <option value="هيئة الهلال الأحمر السعودي">هيئة الهلال الأحمر السعودي</option>
+            <option value="شركة التأمين">شركة التأمين</option>
+            <option value="الجهة المشغلة">الجهة المشغلة</option>
             <option value="أخرى">أخرى</option>
           </select>
         </div>
@@ -821,10 +824,17 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
           </select>
         </div>
         <div class="مجموعة-حقل">
-          <label>المركز <span class="مطلوب">*</span></label>
-          <select id="حادث_مركز" required>
+          <label>المركز <span style="color:var(--نص-رمادي);font-size:0.8em">(اختياري)</span></label>
+          <select id="حادث_مركز">
             <option value="">-- اختر المركز --</option>
           </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>نسبة الخطأ (%)</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="حادث_نسبة_خطأ" min="0" max="100" step="5" value="0" oninput="document.getElementById('حادث_نسبة_خطأ_قيمة').textContent=this.value+'%'" style="flex:1;accent-color:var(--أحمر)">
+            <span id="حادث_نسبة_خطأ_قيمة" style="font-weight:bold;color:var(--أحمر);min-width:45px;text-align:center;font-size:1.1em">0%</span>
+          </div>
         </div>
         <div class="مجموعة-حقل عرض-كامل">
           <label>وصف الحادث <span class="مطلوب">*</span></label>
@@ -853,7 +863,7 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
         <thead>
           <tr>
             <th>رقم الطلب</th><th>التاريخ</th><th>رقم اللوحة</th>
-            <th>نوع الحادث</th><th>القطاع</th><th>الحالة</th><th>إجراء</th>
+            <th>نوع الحادث</th><th>نسبة الخطأ</th><th>القطاع</th><th>الحالة</th><th>إجراء</th>
           </tr>
         </thead>
         <tbody>
@@ -930,8 +940,8 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
           </select>
         </div>
         <div class="مجموعة-حقل">
-          <label>المركز <span class="مطلوب">*</span></label>
-          <select id="صيانة_مركز" required>
+          <label>المركز <span style="color:var(--نص-رمادي);font-size:0.8em">(اختياري)</span></label>
+          <select id="صيانة_مركز">
             <option value="">-- اختر المركز --</option>
           </select>
         </div>
@@ -982,7 +992,7 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
         <thead>
           <tr>
             <th>رقم الطلب</th><th>التاريخ</th><th>رقم اللوحة</th>
-            <th>نوع العطل</th><th>الفني</th><th>حالة الإنجاز</th><th>إجراء</th>
+            <th>نوع العطل</th><th>الفني</th><th>حالة الإنجاز</th><th>إجراء</th><th>تعديل</th>
           </tr>
         </thead>
         <tbody>
@@ -1078,8 +1088,8 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
           </select>
         </div>
         <div class="مجموعة-حقل">
-          <label>المركز <span class="مطلوب">*</span></label>
-          <select id="زيت_مركز" required>
+          <label>المركز <span style="color:var(--نص-رمادي);font-size:0.8em">(اختياري)</span></label>
+          <select id="زيت_مركز">
             <option value="">-- اختر المركز --</option>
           </select>
         </div>
@@ -1114,7 +1124,7 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
             <th>رقم الطلب</th><th>التاريخ</th><th>رقم اللوحة</th>
             <th>القطاع</th><th>قراءة العداد</th>
             <th>الموعد القادم (كم)</th><th>الموعد القادم (تاريخ)</th>
-            <th>الفني</th>
+            <th>الفني</th><th>تعديل</th>
           </tr>
         </thead>
         <tbody>
@@ -1353,5 +1363,23 @@ window.addEventListener('DOMContentLoaded', function() {
   setTimeout(تهيئة_بيانات_البحث, 500);
 });
 </script>
+
+<!-- ==========================================
+     نافذة التعديل العامة
+=========================================== -->
+<div id="نافذة_التعديل" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto">
+  <div style="background:var(--خلفية-ثانوية);border-radius:12px;padding:25px;max-width:600px;margin:40px auto;border:1px solid var(--حدود)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 id="عنوان_نافذة_التعديل" style="color:var(--أخضر-فاتح);margin:0">✏️ تعديل السجل</h3>
+      <button onclick="إغلاق_نافذة_التعديل()" style="background:none;border:none;color:var(--نص-رمادي);font-size:1.5em;cursor:pointer">✕</button>
+    </div>
+    <div id="محتوى_نافذة_التعديل"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+      <button onclick="إغلاق_نافذة_التعديل()" class="زر زر-ثانوي">إلغاء</button>
+      <button onclick="حفظ_التعديل()" class="زر زر-رئيسي" style="background:var(--أخضر-داكن)">💾 حفظ التعديل</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
