@@ -156,6 +156,42 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
 .زر-حفظ:hover { background:linear-gradient(135deg,var(--أخضر-فاتح),#2ecc71); transform:translateY(-1px); }
 .زر-حفظ:disabled { background:#333; cursor:not-allowed; transform:none; }
 
+/* ====== مكوّن البحث في قوائم اللوحات ====== */
+.حاوية-بحث-لوحة { position:relative; }
+.حقل-بحث-لوحة {
+  width:100%; padding:9px 12px 9px 36px; background:var(--خلفية-حقل);
+  border:1px solid var(--حدود); border-radius:8px; color:var(--نص-رئيسي);
+  font-family:'Cairo',sans-serif; font-size:13px; transition:var(--انتقال);
+  box-sizing:border-box;
+}
+.حقل-بحث-لوحة:focus { outline:none; border-color:var(--أخضر-رئيسي); background:rgba(13,59,30,0.8); }
+.أيقونة-بحث-لوحة { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--نص-رمادي); font-size:14px; pointer-events:none; }
+.قائمة-نتائج-لوحة {
+  position:absolute; top:calc(100% + 4px); right:0; left:0; z-index:1000;
+  background:#0f2518; border:1px solid var(--أخضر-رئيسي); border-radius:8px;
+  max-height:220px; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  display:none;
+}
+.قائمة-نتائج-لوحة.مفتوحة { display:block; }
+.عنصر-نتيجة-لوحة {
+  padding:9px 14px; cursor:pointer; font-size:12px; color:var(--نص-رئيسي);
+  border-bottom:1px solid rgba(30,74,42,0.3); transition:background 0.15s;
+  text-align:right;
+}
+.عنصر-نتيجة-لوحة:hover, .عنصر-نتيجة-لوحة.محدد { background:rgba(26,122,60,0.25); color:#fff; }
+.عنصر-نتيجة-لوحة:last-child { border-bottom:none; }
+.عنصر-نتيجة-لوحة .رقم-لوحة-نتيجة { font-weight:800; color:var(--أخضر-فاتح); }
+.عنصر-نتيجة-لوحة .نوع-مركبة-نتيجة { font-size:11px; color:var(--نص-رمادي); margin-right:8px; }
+.لا-نتائج-لوحة { padding:12px; text-align:center; color:var(--نص-رمادي); font-size:12px; }
+.قيمة-مختارة-لوحة {
+  display:none; padding:9px 12px; background:rgba(26,122,60,0.15);
+  border:1px solid var(--أخضر-رئيسي); border-radius:8px; font-size:13px;
+  color:var(--أخضر-فاتح); font-weight:700; cursor:pointer; align-items:center;
+  justify-content:space-between;
+}
+.قيمة-مختارة-لوحة.ظاهرة { display:flex; }
+.قيمة-مختارة-لوحة .زر-مسح-لوحة { background:none; border:none; color:var(--أحمر); cursor:pointer; font-size:14px; padding:0 4px; }
+
 /* ====== بطاقة معلومات المركبة ====== */
 .بطاقة-معلومات-مركبة { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; background:rgba(26,122,60,0.08); border:1px solid rgba(26,122,60,0.3); border-radius:10px; padding:12px; margin:12px 0; }
 .عنصر-معلومات { display:flex; flex-direction:column; gap:3px; }
@@ -621,9 +657,16 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
         </div>
         <div class="مجموعة-حقل">
           <label>رقم اللوحة <span class="مطلوب">*</span></label>
-          <select id="رصد_لوحة" data-نوع="لوحة" onchange="عند_اختيار_لوحة(this.value,'رصد')" required>
-            <option value="">-- اختر رقم اللوحة --</option>
-          </select>
+          <div class="حاوية-بحث-لوحة">
+            <div class="قيمة-مختارة-لوحة" id="رصد_لوحة_عرض">
+              <span id="رصد_لوحة_نص"></span>
+              <button class="زر-مسح-لوحة" onclick="مسح_اختيار_لوحة('رصد')" type="button">✕</button>
+            </div>
+            <input type="text" class="حقل-بحث-لوحة" id="رصد_بحث_لوحة" placeholder="🔍 ابحث برقم اللوحة أو الحرف..." autocomplete="off"
+              oninput="بحث_لوحة(this,'رصد')" onfocus="فتح_قائمة_لوحة('رصد')">
+            <div class="قائمة-نتائج-لوحة" id="رصد_قائمة_لوحة"></div>
+            <input type="hidden" id="رصد_لوحة" required>
+          </div>
         </div>
         <div class="مجموعة-حقل">
           <label>قراءة العداد (كم)</label>
@@ -711,9 +754,16 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
         </div>
         <div class="مجموعة-حقل">
           <label>رقم اللوحة <span class="مطلوب">*</span></label>
-          <select id="حادث_لوحة" data-نوع="لوحة" onchange="عند_اختيار_لوحة(this.value,'حادث')" required>
-            <option value="">-- اختر رقم اللوحة --</option>
-          </select>
+          <div class="حاوية-بحث-لوحة">
+            <div class="قيمة-مختارة-لوحة" id="حادث_لوحة_عرض">
+              <span id="حادث_لوحة_نص"></span>
+              <button class="زر-مسح-لوحة" onclick="مسح_اختيار_لوحة('حادث')" type="button">✕</button>
+            </div>
+            <input type="text" class="حقل-بحث-لوحة" id="حادث_بحث_لوحة" placeholder="🔍 ابحث برقم اللوحة أو الحرف..." autocomplete="off"
+              oninput="بحث_لوحة(this,'حادث')" onfocus="فتح_قائمة_لوحة('حادث')">
+            <div class="قائمة-نتائج-لوحة" id="حادث_قائمة_لوحة"></div>
+            <input type="hidden" id="حادث_لوحة" required>
+          </div>
         </div>
         <div class="مجموعة-حقل">
           <label>نوع الحادث <span class="مطلوب">*</span></label>
@@ -835,9 +885,16 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
         </div>
         <div class="مجموعة-حقل">
           <label>رقم اللوحة <span class="مطلوب">*</span></label>
-          <select id="صيانة_لوحة" data-نوع="لوحة" onchange="عند_اختيار_لوحة(this.value,'صيانة')" required>
-            <option value="">-- اختر رقم اللوحة --</option>
-          </select>
+          <div class="حاوية-بحث-لوحة">
+            <div class="قيمة-مختارة-لوحة" id="صيانة_لوحة_عرض">
+              <span id="صيانة_لوحة_نص"></span>
+              <button class="زر-مسح-لوحة" onclick="مسح_اختيار_لوحة('صيانة')" type="button">✕</button>
+            </div>
+            <input type="text" class="حقل-بحث-لوحة" id="صيانة_بحث_لوحة" placeholder="🔍 ابحث برقم اللوحة أو الحرف..." autocomplete="off"
+              oninput="بحث_لوحة(this,'صيانة')" onfocus="فتح_قائمة_لوحة('صيانة')">
+            <div class="قائمة-نتائج-لوحة" id="صيانة_قائمة_لوحة"></div>
+            <input type="hidden" id="صيانة_لوحة" required>
+          </div>
         </div>
         <div class="مجموعة-حقل">
           <label>قراءة العداد (كم)</label>
@@ -957,9 +1014,16 @@ tbody td { padding:9px 12px; font-size:12px; text-align:center; color:var(--نص
         </div>
         <div class="مجموعة-حقل">
           <label>رقم اللوحة <span class="مطلوب">*</span></label>
-          <select id="زيت_لوحة" data-نوع="لوحة" onchange="عند_اختيار_لوحة(this.value,'زيت')" required>
-            <option value="">-- اختر رقم اللوحة --</option>
-          </select>
+          <div class="حاوية-بحث-لوحة">
+            <div class="قيمة-مختارة-لوحة" id="زيت_لوحة_عرض">
+              <span id="زيت_لوحة_نص"></span>
+              <button class="زر-مسح-لوحة" onclick="مسح_اختيار_لوحة('زيت')" type="button">✕</button>
+            </div>
+            <input type="text" class="حقل-بحث-لوحة" id="زيت_بحث_لوحة" placeholder="🔍 ابحث برقم اللوحة أو الحرف..." autocomplete="off"
+              oninput="بحث_لوحة(this,'زيت')" onfocus="فتح_قائمة_لوحة('زيت')">
+            <div class="قائمة-نتائج-لوحة" id="زيت_قائمة_لوحة"></div>
+            <input type="hidden" id="زيت_لوحة" required>
+          </div>
         </div>
         <div class="مجموعة-حقل">
           <label>قراءة العداد الحالية (كم) <span class="مطلوب">*</span></label>
@@ -1164,5 +1228,132 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="app.js?v=4.0"></script>
+
+<!-- ====== مكوّن البحث في قوائم اللوحات ====== -->
+<script>
+// قائمة المركبات الكاملة للبحث
+var بيانات_البحث = [];
+
+// تهيئة بيانات البحث من بيانات الأسطول
+function تهيئة_بيانات_البحث() {
+  if (typeof بيانات_الأسطول !== 'undefined' && بيانات_الأسطول.length > 0) {
+    بيانات_البحث = بيانات_الأسطول;
+  }
+}
+
+// فتح قائمة اللوحة بعرض أول 20 مركبة
+function فتح_قائمة_لوحة(نموذج) {
+  تهيئة_بيانات_البحث();
+  var حقل = document.getElementById(نموذج + '_بحث_لوحة');
+  var نص = حقل ? حقل.value.trim() : '';
+  عرض_نتائج_لوحة(نموذج, نص);
+}
+
+// بحث في قائمة اللوحات
+function بحث_لوحة(حقل, نموذج) {
+  تهيئة_بيانات_البحث();
+  var نص = حقل.value.trim();
+  عرض_نتائج_لوحة(نموذج, نص);
+}
+
+// عرض النتائج في القائمة
+function عرض_نتائج_لوحة(نموذج, نص_بحث) {
+  var قائمة = document.getElementById(نموذج + '_قائمة_لوحة');
+  if (!قائمة) return;
+
+  var بيانات = بيانات_البحث;
+  var مصفاة = [];
+
+  if (نص_بحث === '') {
+    // عرض أول 30 مركبة عند الفتح بدون بحث
+    مصفاة = بيانات.slice(0, 30);
+  } else {
+    var بحث_لور = نص_بحث.toLowerCase();
+    مصفاة = بيانات.filter(function(م) {
+      var لوحة = (م['رقم_اللوحة'] || '').toLowerCase();
+      var نوع = (م['النوع'] || '').toLowerCase();
+      var موديل = (م['الموديل'] || '').toLowerCase();
+      return لوحة.includes(بحث_لور) || نوع.includes(بحث_لور) || موديل.includes(بحث_لور);
+    }).slice(0, 50);
+  }
+
+  if (مصفاة.length === 0) {
+    قائمة.innerHTML = '<div class="لا-نتائج-لوحة">⚠️ لا توجد مركبة بهذا البحث</div>';
+  } else {
+    قائمة.innerHTML = مصفاة.map(function(م) {
+      var لوحة = م['رقم_اللوحة'] || '';
+      var نوع = م['النوع'] || '';
+      var موديل = م['الموديل'] || '';
+      return '<div class="عنصر-نتيجة-لوحة" onclick="اختيار_لوحة(\''+لوحة+'\',\''+نموذج+'\')">' +
+        '<span class="رقم-لوحة-نتيجة">' + لوحة + '</span>' +
+        '<span class="نوع-مركبة-نتيجة">' + نوع + ' ' + موديل + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  قائمة.classList.add('مفتوحة');
+}
+
+// اختيار لوحة من القائمة
+function اختيار_لوحة(رقم_اللوحة, نموذج) {
+  // حفظ القيمة في الحقل المخفي
+  var حقل_مخفي = document.getElementById(نموذج + '_لوحة');
+  if (حقل_مخفي) حقل_مخفي.value = رقم_اللوحة;
+
+  // إخفاء حقل البحث وإظهار القيمة المختارة
+  var حقل_بحث = document.getElementById(نموذج + '_بحث_لوحة');
+  var عرض = document.getElementById(نموذج + '_لوحة_عرض');
+  var نص_عرض = document.getElementById(نموذج + '_لوحة_نص');
+
+  // إيجاد بيانات المركبة
+  var مركبة = بيانات_البحث.find(function(م) { return م['رقم_اللوحة'] === رقم_اللوحة; });
+  var نص_العرض = رقم_اللوحة;
+  if (مركبة) نص_العرض = رقم_اللوحة + ' — ' + (مركبة['النوع'] || '') + ' ' + (مركبة['الموديل'] || '');
+
+  if (حقل_بحث) حقل_بحث.style.display = 'none';
+  if (عرض) عرض.classList.add('ظاهرة');
+  if (نص_عرض) نص_عرض.textContent = نص_العرض;
+
+  // إغلاق القائمة
+  var قائمة = document.getElementById(نموذج + '_قائمة_لوحة');
+  if (قائمة) قائمة.classList.remove('مفتوحة');
+
+  // تفعيل دالة سحب بيانات المركبة
+  if (typeof عند_اختيار_لوحة === 'function') {
+    عند_اختيار_لوحة(رقم_اللوحة, نموذج);
+  }
+}
+
+// مسح الاختيار وإعادة حقل البحث
+function مسح_اختيار_لوحة(نموذج) {
+  var حقل_مخفي = document.getElementById(نموذج + '_لوحة');
+  var حقل_بحث = document.getElementById(نموذج + '_بحث_لوحة');
+  var عرض = document.getElementById(نموذج + '_لوحة_عرض');
+  var قائمة = document.getElementById(نموذج + '_قائمة_لوحة');
+
+  if (حقل_مخفي) حقل_مخفي.value = '';
+  if (حقل_بحث) { حقل_بحث.value = ''; حقل_بحث.style.display = ''; حقل_بحث.focus(); }
+  if (عرض) عرض.classList.remove('ظاهرة');
+  if (قائمة) قائمة.classList.remove('مفتوحة');
+
+  // مسح بيانات المركبة المعروضة
+  var بطاقة = document.getElementById(نموذج + '_بطاقة_المركبة');
+  if (بطاقة) بطاقة.style.display = 'none';
+}
+
+// إغلاق القائمة عند النقر خارجها
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.حاوية-بحث-لوحة')) {
+    document.querySelectorAll('.قائمة-نتائج-لوحة').forEach(function(q) {
+      q.classList.remove('مفتوحة');
+    });
+  }
+});
+
+// تهيئة بيانات البحث بعد تحميل الصفحة
+window.addEventListener('DOMContentLoaded', function() {
+  setTimeout(تهيئة_بيانات_البحث, 500);
+});
+</script>
 </body>
 </html>
