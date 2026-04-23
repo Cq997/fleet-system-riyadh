@@ -676,6 +676,7 @@ function حفظ_حادث(حدث) {
     'الأضرار': الحصول_على_قيمة(نموذج, 'حادث_اضرار'),
     'رقم_التقرير': الحصول_على_قيمة(نموذج, 'حادث_رقم_تقرير'),
     'الجهة_المصدرة': الحصول_على_قيمة(نموذج, 'حادث_جهة_تقرير'),
+    'نسبة_الخطأ': (document.getElementById('حادث_نسبة_خطأ') ? document.getElementById('حادث_نسبة_خطأ').value + '%' : '0%'),
     'الحالة': 'قيد المعالجة',
     'حالة_الإنجاز': 'غير منجز',
     'وقت_الإدخال': new Date().toLocaleString('ar-SA')
@@ -690,18 +691,25 @@ function تحديث_جدول_الحوادث() {
   var tbody = document.querySelector('#جدول_الحوادث tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
-  بيانات_الحوادث.slice(-10).reverse().forEach(function(ح) {
+  if (بيانات_الحوادث.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;color:var(--نص-رمادي)">لا توجد سجلات</td></tr>';
+    return;
+  }
+  بيانات_الحوادث.slice(-20).reverse().forEach(function(ح, idx) {
     var حالة = ح['الحالة'] || 'قيد المعالجة';
+    var فهرس = بيانات_الحوادث.length - 1 - idx;
     tbody.innerHTML +=
       '<tr><td>' + (ح['رقم_الطلب'] || '') + '</td>' +
       '<td>' + (ح['التاريخ'] || '') + '</td>' +
       '<td><strong>' + (ح['رقم_اللوحة'] || '') + '</strong></td>' +
       '<td>' + (ح['نوع_الحادث'] || '') + '</td>' +
+      '<td style="text-align:center;font-weight:bold;color:var(--أحمر)">' + (ح['نسبة_الخطأ'] || '0%') + '</td>' +
       '<td>' + (ح['القطاع'] || '') + '</td>' +
       '<td><span class="شارة ' + (حالة === 'مغلق' ? 'عاملة' : 'صيانة') + '">' + حالة + '</span></td>' +
       '<td>' +
-        '<button onclick="تحديث_حالة_حادث(\'' + (ح['رقم_الطلب'] || '') + '\',\'منجز\')" class="زر-جدول نجاح">منجز</button> ' +
-        '<button onclick="تحديث_حالة_حادث(\'' + (ح['رقم_الطلب'] || '') + '\',\'مغلق\')" class="زر-جدول خطر">مغلق</button>' +
+        '<button onclick="تحديث_حالة_حادث(\'' + (ح['رقم_الطلب'] || '') + '\',\'منجز\')" class="زر-جدول نجاح" title="تحديد كمنجز">✅</button> ' +
+        '<button onclick="تحديث_حالة_حادث(\'' + (ح['رقم_الطلب'] || '') + '\',\'مغلق\')" class="زر-جدول خطر" title="إغلاق الطلب">🔒</button> ' +
+        '<button onclick="تعديل_سجل(\'حوادث\',' + فهرس + ')" class="زر-جدول تعديل" title="تعديل السجل">✏️</button>' +
       '</td></tr>';
   });
 }
@@ -754,8 +762,13 @@ function تحديث_جدول_الصيانة() {
   var tbody = document.querySelector('#جدول_الصيانة tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
-  بيانات_الصيانة_الوقائية.slice(-10).reverse().forEach(function(ص) {
+  if (بيانات_الصيانة_الوقائية.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;color:var(--نص-رمادي)">لا توجد سجلات</td></tr>';
+    return;
+  }
+  بيانات_الصيانة_الوقائية.slice(-20).reverse().forEach(function(ص, idx) {
     var حالة = ص['حالة_الإنجاز'] || 'غير منجز';
+    var فهرس = بيانات_الصيانة_الوقائية.length - 1 - idx;
     tbody.innerHTML +=
       '<tr><td>' + (ص['رقم_الطلب'] || '') + '</td>' +
       '<td>' + (ص['التاريخ'] || '') + '</td>' +
@@ -764,8 +777,10 @@ function تحديث_جدول_الصيانة() {
       '<td>' + (ص['الفني_المسؤول'] || '') + '</td>' +
       '<td><span class="شارة ' + (حالة === 'منجز' ? 'عاملة' : 'صيانة') + '">' + حالة + '</span></td>' +
       '<td>' +
-        (حالة !== 'منجز' ? '<button onclick="إنجاز_صيانة(\'' + (ص['رقم_الطلب'] || '') + '\')" class="زر-جدول نجاح">تحديد كمنجز</button>' : '<span class="تم-الانجاز">✅ منجز</span>') +
-      '</td></tr>';
+        (حالة !== 'منجز' ? '<button onclick="إنجاز_صيانة(\'' + (ص['رقم_الطلب'] || '') + '\')" class="زر-جدول نجاح" title="تحديد كمنجز">✅ منجز</button>' : '<span class="تم-الانجاز">✅ منجز</span>') +
+      '</td>' +
+      '<td><button onclick="تعديل_سجل(\'صيانة\',' + فهرس + ')" class="زر-جدول تعديل" title="تعديل السجل">✏️ تعديل</button></td>' +
+      '</tr>';
   });
 }
 
@@ -833,16 +848,22 @@ function تحديث_جدول_تغيير_الزيت() {
   var tbody = document.querySelector('#جدول_تغيير_الزيت tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
-  بيانات_تغيير_الزيت.slice(-10).reverse().forEach(function(ز) {
+  if (بيانات_تغيير_الزيت.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="padding:20px;color:var(--نص-رمادي)">لا توجد سجلات</td></tr>';
+    return;
+  }
+  بيانات_تغيير_الزيت.slice(-20).reverse().forEach(function(ز, idx) {
+    var فهرس = بيانات_تغيير_الزيت.length - 1 - idx;
     tbody.innerHTML +=
       '<tr><td>' + (ز['رقم_الطلب'] || '') + '</td>' +
       '<td>' + (ز['التاريخ'] || '') + '</td>' +
       '<td><strong>' + (ز['رقم_اللوحة'] || '') + '</strong></td>' +
       '<td>' + (ز['القطاع'] || '') + '</td>' +
-      '<td>' + ((ز['قراءة_العداد'] || 0)).toLocaleString('ar-SA') + ' كم</td>' +
-      '<td>' + ((ز['الموعد_القادم_كم'] || 0)).toLocaleString('ar-SA') + ' كم</td>' +
+      '<td>' + ((parseInt(ز['قراءة_العداد']) || 0)).toLocaleString('ar-SA') + ' كم</td>' +
+      '<td>' + ((parseInt(ز['الموعد_القادم_كم']) || 0)).toLocaleString('ar-SA') + ' كم</td>' +
       '<td>' + (ز['الموعد_القادم_تاريخ'] || '') + '</td>' +
       '<td>' + (ز['الفني_المسؤول'] || '') + '</td>' +
+      '<td><button onclick="تعديل_سجل(\'زيت\',' + فهرس + ')" class="زر-جدول تعديل" title="تعديل السجل">✏️ تعديل</button></td>' +
       '</tr>';
   });
 }
@@ -1056,4 +1077,170 @@ function تحديث_مؤشر_الزيت(مركبة) {
   }
   if (نص) نص.textContent = 'حالة الزيت: ' + فرق_كم.toLocaleString('ar-SA') + ' كم | ' + فرق_ايام + ' يوم';
   if (نسبة_el) نسبة_el.textContent = نسبة + '%';
+}
+
+
+// ====== نظام التعديل الشامل ======
+var سجل_تعديل_حالي = { نوع: '', فهرس: -1 };
+
+function تعديل_سجل(نوع, فهرس) {
+  سجل_تعديل_حالي = { نوع: نوع, فهرس: فهرس };
+  var بيانات = null;
+  var عنوان = '';
+  var حقول = '';
+
+  if (نوع === 'حوادث') {
+    بيانات = بيانات_الحوادث[فهرس];
+    عنوان = '✏️ تعديل سجل الحادث - ' + (بيانات['رقم_الطلب'] || '');
+    حقول = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">نوع الحادث</label>
+          <select id="تعديل_نوع_الحادث" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">
+            <option value="تصادم" ${بيانات['نوع_الحادث']==='تصادم'?'selected':''}>تصادم</option>
+            <option value="انقلاب" ${بيانات['نوع_الحادث']==='انقلاب'?'selected':''}>انقلاب</option>
+            <option value="حريق" ${بيانات['نوع_الحادث']==='حريق'?'selected':''}>حريق</option>
+            <option value="سرقة" ${بيانات['نوع_الحادث']==='سرقة'?'selected':''}>سرقة</option>
+            <option value="تلف ميكانيكي" ${بيانات['نوع_الحادث']==='تلف ميكانيكي'?'selected':''}>تلف ميكانيكي</option>
+            <option value="حادث طرق" ${بيانات['نوع_الحادث']==='حادث طرق'?'selected':''}>حادث طرق</option>
+            <option value="أخرى" ${بيانات['نوع_الحادث']==='أخرى'?'selected':''}>أخرى</option>
+          </select></div>
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">نسبة الخطأ (%)</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="range" id="تعديل_نسبة_خطأ" min="0" max="100" step="5" value="${parseInt(بيانات['نسبة_الخطأ']) || 0}" oninput="document.getElementById('تعديل_نسبة_قيمة').textContent=this.value+'%'" style="flex:1;accent-color:var(--أحمر)">
+            <span id="تعديل_نسبة_قيمة" style="font-weight:bold;color:var(--أحمر);min-width:40px">${بيانات['نسبة_الخطأ'] || '0%'}</span>
+          </div></div>
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">الحالة</label>
+          <select id="تعديل_حالة_الحادث" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">
+            <option value="قيد المعالجة" ${بيانات['الحالة']==='قيد المعالجة'?'selected':''}>قيد المعالجة</option>
+            <option value="منجز" ${بيانات['الحالة']==='منجز'?'selected':''}>منجز</option>
+            <option value="مغلق" ${بيانات['الحالة']==='مغلق'?'selected':''}>مغلق</option>
+          </select></div>
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">رقم التقرير</label>
+          <input type="text" id="تعديل_رقم_تقرير" value="${بيانات['رقم_التقرير'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
+        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">وصف الحادث</label>
+          <textarea id="تعديل_وصف_الحادث" rows="3" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['وصف_الحادث'] || ''}</textarea></div>
+        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">الأضرار</label>
+          <textarea id="تعديل_الأضرار" rows="2" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['الأضرار'] || ''}</textarea></div>
+      </div>`;
+  } else if (نوع === 'صيانة') {
+    بيانات = بيانات_الصيانة_الوقائية[فهرس];
+    عنوان = '✏️ تعديل سجل الصيانة - ' + (بيانات['رقم_الطلب'] || '');
+    حقول = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">حالة الإنجاز</label>
+          <select id="تعديل_حالة_صيانة" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">
+            <option value="غير منجز" ${بيانات['حالة_الإنجاز']==='غير منجز'?'selected':''}>غير منجز</option>
+            <option value="قيد التنفيذ" ${بيانات['حالة_الإنجاز']==='قيد التنفيذ'?'selected':''}>قيد التنفيذ</option>
+            <option value="منجز" ${بيانات['حالة_الإنجاز']==='منجز'?'selected':''}>منجز</option>
+          </select></div>
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">التكلفة الفعلية (ريال)</label>
+          <input type="number" id="تعديل_تكلفة_صيانة" value="${بيانات['التكلفة_التقديرية'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
+        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">ملاحظات</label>
+          <textarea id="تعديل_ملاحظات_صيانة" rows="3" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['ملاحظات'] || ''}</textarea></div>
+      </div>`;
+  } else if (نوع === 'زيت') {
+    بيانات = بيانات_تغيير_الزيت[فهرس];
+    عنوان = '✏️ تعديل سجل تغيير الزيت - ' + (بيانات['رقم_الطلب'] || '');
+    حقول = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">قراءة العداد (كم)</label>
+          <input type="number" id="تعديل_عداد_زيت" value="${بيانات['قراءة_العداد'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">نوع الزيت</label>
+          <input type="text" id="تعديل_نوع_زيت" value="${بيانات['نوع_الزيت'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
+        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">ملاحظات</label>
+          <textarea id="تعديل_ملاحظات_زيت" rows="3" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['ملاحظات'] || ''}</textarea></div>
+      </div>`;
+  } else if (نوع === 'رصد') {
+    بيانات = بيانات_الرصد[فهرس];
+    عنوان = '✏️ تعديل سجل الرصد - ' + (بيانات['رقم_اللوحة'] || '');
+    حقول = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">الموقع الحالي</label>
+          <input type="text" id="تعديل_موقع_رصد" value="${بيانات['الموقع'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
+        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">حالة المركبة</label>
+          <select id="تعديل_حالة_رصد" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">
+            <option value="عاملة" ${بيانات['الحالة']==='عاملة'?'selected':''}>✅ عاملة</option>
+            <option value="خارج الخدمة" ${بيانات['الحالة']==='خارج الخدمة'?'selected':''}>❌ خارج الخدمة</option>
+            <option value="صيانة" ${بيانات['الحالة']==='صيانة'?'selected':''}>🔧 صيانة</option>
+            <option value="في مهمة" ${بيانات['الحالة']==='في مهمة'?'selected':''}>🚑 في مهمة</option>
+          </select></div>
+        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">ملاحظات</label>
+          <textarea id="تعديل_ملاحظات_رصد" rows="2" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['ملاحظات'] || ''}</textarea></div>
+      </div>`;
+  }
+
+  if (!بيانات) return;
+  var نافذة = document.getElementById('نافذة_التعديل');
+  var عنوان_عنصر = document.getElementById('عنوان_نافذة_التعديل');
+  var محتوى = document.getElementById('محتوى_نافذة_التعديل');
+  if (نافذة && عنوان_عنصر && محتوى) {
+    عنوان_عنصر.textContent = عنوان;
+    محتوى.innerHTML = حقول;
+    نافذة.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function إغلاق_نافذة_التعديل() {
+  var نافذة = document.getElementById('نافذة_التعديل');
+  if (نافذة) نافذة.style.display = 'none';
+  document.body.style.overflow = '';
+  سجل_تعديل_حالي = { نوع: '', فهرس: -1 };
+}
+
+function حفظ_التعديل() {
+  var نوع = سجل_تعديل_حالي.نوع;
+  var فهرس = سجل_تعديل_حالي.فهرس;
+  if (!نوع || فهرس < 0) return;
+
+  if (نوع === 'حوادث') {
+    var سجل = بيانات_الحوادث[فهرس];
+    if (!سجل) return;
+    var نسبة_خطأ_el = document.getElementById('تعديل_نسبة_خطأ');
+    سجل['نوع_الحادث'] = document.getElementById('تعديل_نوع_الحادث') ? document.getElementById('تعديل_نوع_الحادث').value : سجل['نوع_الحادث'];
+    سجل['نسبة_الخطأ'] = نسبة_خطأ_el ? نسبة_خطأ_el.value + '%' : سجل['نسبة_الخطأ'];
+    سجل['الحالة'] = document.getElementById('تعديل_حالة_الحادث') ? document.getElementById('تعديل_حالة_الحادث').value : سجل['الحالة'];
+    سجل['رقم_التقرير'] = document.getElementById('تعديل_رقم_تقرير') ? document.getElementById('تعديل_رقم_تقرير').value : سجل['رقم_التقرير'];
+    سجل['وصف_الحادث'] = document.getElementById('تعديل_وصف_الحادث') ? document.getElementById('تعديل_وصف_الحادث').value : سجل['وصف_الحادث'];
+    سجل['الأضرار'] = document.getElementById('تعديل_الأضرار') ? document.getElementById('تعديل_الأضرار').value : سجل['الأضرار'];
+    سجل['تاريخ_التحديث'] = new Date().toLocaleString('ar-SA');
+    تحديث_جدول_الحوادث();
+    تحديث_لوحة_القائد();
+  } else if (نوع === 'صيانة') {
+    var سجل = بيانات_الصيانة_الوقائية[فهرس];
+    if (!سجل) return;
+    سجل['حالة_الإنجاز'] = document.getElementById('تعديل_حالة_صيانة') ? document.getElementById('تعديل_حالة_صيانة').value : سجل['حالة_الإنجاز'];
+    سجل['التكلفة_التقديرية'] = document.getElementById('تعديل_تكلفة_صيانة') ? document.getElementById('تعديل_تكلفة_صيانة').value : سجل['التكلفة_التقديرية'];
+    سجل['ملاحظات'] = document.getElementById('تعديل_ملاحظات_صيانة') ? document.getElementById('تعديل_ملاحظات_صيانة').value : سجل['ملاحظات'];
+    سجل['تاريخ_التحديث'] = new Date().toLocaleString('ar-SA');
+    تحديث_جدول_الصيانة();
+    تحديث_لوحة_القائد();
+  } else if (نوع === 'زيت') {
+    var سجل = بيانات_تغيير_الزيت[فهرس];
+    if (!سجل) return;
+    var عداد_جديد = parseInt(document.getElementById('تعديل_عداد_زيت') ? document.getElementById('تعديل_عداد_زيت').value : 0) || 0;
+    سجل['قراءة_العداد'] = عداد_جديد;
+    سجل['الموعد_القادم_كم'] = عداد_جديد + 5000;
+    سجل['نوع_الزيت'] = document.getElementById('تعديل_نوع_زيت') ? document.getElementById('تعديل_نوع_زيت').value : سجل['نوع_الزيت'];
+    سجل['ملاحظات'] = document.getElementById('تعديل_ملاحظات_زيت') ? document.getElementById('تعديل_ملاحظات_زيت').value : سجل['ملاحظات'];
+    سجل['تاريخ_التحديث'] = new Date().toLocaleString('ar-SA');
+    تحديث_جدول_تغيير_الزيت();
+    فحص_تنبيهات_الزيت();
+  } else if (نوع === 'رصد') {
+    var سجل = بيانات_الرصد[فهرس];
+    if (!سجل) return;
+    سجل['الموقع'] = document.getElementById('تعديل_موقع_رصد') ? document.getElementById('تعديل_موقع_رصد').value : سجل['الموقع'];
+    سجل['الحالة'] = document.getElementById('تعديل_حالة_رصد') ? document.getElementById('تعديل_حالة_رصد').value : سجل['الحالة'];
+    سجل['ملاحظات'] = document.getElementById('تعديل_ملاحظات_رصد') ? document.getElementById('تعديل_ملاحظات_رصد').value : سجل['ملاحظات'];
+    سجل['تاريخ_التحديث'] = new Date().toLocaleString('ar-SA');
+  }
+
+  حفظ_في_شيت(
+    نوع === 'حوادث' ? 'الحوادث' : نوع === 'صيانة' ? 'الصيانة الوقائية' : نوع === 'زيت' ? 'تغيير الزيت' : 'رصد المركبات',
+    نوع === 'حوادث' ? بيانات_الحوادث[فهرس] : نوع === 'صيانة' ? بيانات_الصيانة_الوقائية[فهرس] : نوع === 'زيت' ? بيانات_تغيير_الزيت[فهرس] : بيانات_الرصد[فهرس],
+    null
+  );
+
+  إغلاق_نافذة_التعديل();
+  إظهار_رسالة('✅ تم حفظ التعديل بنجاح', 'نجاح');
 }
