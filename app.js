@@ -676,7 +676,7 @@ function حفظ_حادث(حدث) {
     'الأضرار': الحصول_على_قيمة(نموذج, 'حادث_اضرار'),
     'رقم_التقرير': الحصول_على_قيمة(نموذج, 'حادث_رقم_تقرير'),
     'الجهة_المصدرة': الحصول_على_قيمة(نموذج, 'حادث_جهة_تقرير'),
-    'نسبة_الخطأ': (document.getElementById('حادث_نسبة_خطأ') ? document.getElementById('حادث_نسبة_خطأ').value + '%' : '0%'),
+    'نسبة_الخطأ': (document.getElementById('حادث_نسبة_خطأ') ? parseInt(document.getElementById('حادث_نسبة_خطأ').value) || 0 : 0),
     'الحالة': 'قيد المعالجة',
     'حالة_الإنجاز': 'غير منجز',
     'وقت_الإدخال': new Date().toLocaleString('ar-SA')
@@ -1092,80 +1092,138 @@ function تعديل_سجل(نوع, فهرس) {
   if (نوع === 'حوادث') {
     بيانات = بيانات_الحوادث[فهرس];
     عنوان = '✏️ تعديل سجل الحادث - ' + (بيانات['رقم_الطلب'] || '');
+    var ف = بيانات;
     حقول = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">نوع الحادث</label>
-          <select id="تعديل_نوع_الحادث" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">
-            <option value="تصادم" ${بيانات['نوع_الحادث']==='تصادم'?'selected':''}>تصادم</option>
-            <option value="انقلاب" ${بيانات['نوع_الحادث']==='انقلاب'?'selected':''}>انقلاب</option>
-            <option value="حريق" ${بيانات['نوع_الحادث']==='حريق'?'selected':''}>حريق</option>
-            <option value="سرقة" ${بيانات['نوع_الحادث']==='سرقة'?'selected':''}>سرقة</option>
-            <option value="تلف ميكانيكي" ${بيانات['نوع_الحادث']==='تلف ميكانيكي'?'selected':''}>تلف ميكانيكي</option>
-            <option value="حادث طرق" ${بيانات['نوع_الحادث']==='حادث طرق'?'selected':''}>حادث طرق</option>
-            <option value="أخرى" ${بيانات['نوع_الحادث']==='أخرى'?'selected':''}>أخرى</option>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><label class="تسمية-تعديل">التاريخ</label>
+          <input type="date" id="تعديل_تاريخ_حادث" value="${ف['التاريخ'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">الوقت</label>
+          <input type="time" id="تعديل_وقت_حادث" value="${ف['الوقت'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">نوع الحادث</label>
+          <select id="تعديل_نوع_الحادث" class="حقل-تعديل">
+            <option value="تصادم" ${ف['النوع']==='تصادم'?'selected':''}>تصادم</option>
+            <option value="انقلاب" ${ف['النوع']==='انقلاب'?'selected':''}>انقلاب</option>
+            <option value="حريق" ${ف['النوع']==='حريق'?'selected':''}>حريق</option>
+            <option value="سرقة" ${ف['النوع']==='سرقة'?'selected':''}>سرقة</option>
+            <option value="تلف ميكانيكي" ${ف['النوع']==='تلف ميكانيكي'?'selected':''}>تلف ميكانيكي</option>
+            <option value="حادث طرق" ${ف['النوع']==='حادث طرق'?'selected':''}>حادث طرق</option>
+            <option value="أخرى" ${ف['النوع']==='أخرى'?'selected':''}>أخرى</option>
           </select></div>
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">نسبة الخطأ (%)</label>
-          <div style="display:flex;align-items:center;gap:8px">
-            <input type="range" id="تعديل_نسبة_خطأ" min="0" max="100" step="5" value="${parseInt(بيانات['نسبة_الخطأ']) || 0}" oninput="document.getElementById('تعديل_نسبة_قيمة').textContent=this.value+'%'" style="flex:1;accent-color:var(--أحمر)">
-            <span id="تعديل_نسبة_قيمة" style="font-weight:bold;color:var(--أحمر);min-width:40px">${بيانات['نسبة_الخطأ'] || '0%'}</span>
-          </div></div>
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">الحالة</label>
-          <select id="تعديل_حالة_الحادث" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">
-            <option value="قيد المعالجة" ${بيانات['الحالة']==='قيد المعالجة'?'selected':''}>قيد المعالجة</option>
-            <option value="منجز" ${بيانات['الحالة']==='منجز'?'selected':''}>منجز</option>
-            <option value="مغلق" ${بيانات['الحالة']==='مغلق'?'selected':''}>مغلق</option>
+        <div><label class="تسمية-تعديل">الحالة</label>
+          <select id="تعديل_حالة_الحادث" class="حقل-تعديل">
+            <option value="قيد المعالجة" ${ف['الحالة']==='قيد المعالجة'?'selected':''}>قيد المعالجة</option>
+            <option value="منجز" ${ف['الحالة']==='منجز'?'selected':''}>منجز</option>
+            <option value="مغلق" ${ف['الحالة']==='مغلق'?'selected':''}>مغلق</option>
           </select></div>
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">رقم التقرير</label>
-          <input type="text" id="تعديل_رقم_تقرير" value="${بيانات['رقم_التقرير'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
-        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">وصف الحادث</label>
-          <textarea id="تعديل_وصف_الحادث" rows="3" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['وصف_الحادث'] || ''}</textarea></div>
-        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">الأضرار</label>
-          <textarea id="تعديل_الأضرار" rows="2" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['الأضرار'] || ''}</textarea></div>
+        <div><label class="تسمية-تعديل">نسبة الخطأ (%)</label>
+          <input type="number" id="تعديل_نسبة_خطأ" min="0" max="100" value="${parseInt(ف['نسبة_الخطأ']) || 0}" class="حقل-تعديل" placeholder="0 - 100"></div>
+        <div><label class="تسمية-تعديل">رقم التقرير</label>
+          <input type="text" id="تعديل_رقم_تقرير" value="${ف['رقم_التقرير'] || ''}" class="حقل-تعديل" placeholder="RPT-2026-001"></div>
+        <div><label class="تسمية-تعديل">الجهة المصدرة للتقرير</label>
+          <select id="تعديل_جهة_تقرير" class="حقل-تعديل">
+            <option value="">-- اختر الجهة --</option>
+            <option value="المرور" ${ف['الجهة_المصدرة']==='المرور'?'selected':''}>المرور</option>
+            <option value="الدفاع المدني" ${ف['الجهة_المصدرة']==='الدفاع المدني'?'selected':''}>الدفاع المدني</option>
+            <option value="الشرطة" ${ف['الجهة_المصدرة']==='الشرطة'?'selected':''}>الشرطة</option>
+            <option value="هيئة الهلال الأحمر السعودي" ${ف['الجهة_المصدرة']==='هيئة الهلال الأحمر السعودي'?'selected':''}>هيئة الهلال الأحمر السعودي</option>
+            <option value="شركة التأمين" ${ف['الجهة_المصدرة']==='شركة التأمين'?'selected':''}>شركة التأمين</option>
+            <option value="أخرى" ${ف['الجهة_المصدرة']==='أخرى'?'selected':''}>أخرى</option>
+          </select></div>
+        <div><label class="تسمية-تعديل">القطاع</label>
+          <input type="text" id="تعديل_قطاع_حادث" value="${ف['القطاع'] || ''}" class="حقل-تعديل"></div>
+        <div style="grid-column:1/-1"><label class="تسمية-تعديل">وصف الحادث</label>
+          <textarea id="تعديل_وصف_الحادث" rows="3" class="حقل-تعديل">${ف['وصف_الحادث'] || ''}</textarea></div>
+        <div style="grid-column:1/-1"><label class="تسمية-تعديل">الأضرار</label>
+          <textarea id="تعديل_الأضرار" rows="2" class="حقل-تعديل">${ف['الأضرار'] || ''}</textarea></div>
       </div>`;
   } else if (نوع === 'صيانة') {
     بيانات = بيانات_الصيانة_الوقائية[فهرس];
     عنوان = '✏️ تعديل سجل الصيانة - ' + (بيانات['رقم_الطلب'] || '');
+    var ف = بيانات;
     حقول = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">حالة الإنجاز</label>
-          <select id="تعديل_حالة_صيانة" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">
-            <option value="غير منجز" ${بيانات['حالة_الإنجاز']==='غير منجز'?'selected':''}>غير منجز</option>
-            <option value="قيد التنفيذ" ${بيانات['حالة_الإنجاز']==='قيد التنفيذ'?'selected':''}>قيد التنفيذ</option>
-            <option value="منجز" ${بيانات['حالة_الإنجاز']==='منجز'?'selected':''}>منجز</option>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><label class="تسمية-تعديل">التاريخ</label>
+          <input type="date" id="تعديل_تاريخ_صيانة" value="${ف['التاريخ'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">رقم اللوحة</label>
+          <input type="text" id="تعديل_لوحة_صيانة" value="${ف['رقم_اللوحة'] || ''}" class="حقل-تعديل" readonly style="opacity:0.7"></div>
+        <div><label class="تسمية-تعديل">نوع المركبة</label>
+          <input type="text" id="تعديل_نوع_مركبة_صيانة" value="${ف['النوع'] || ''}" class="حقل-تعديل" readonly style="opacity:0.7"></div>
+        <div><label class="تسمية-تعديل">القطاع</label>
+          <input type="text" id="تعديل_قطاع_صيانة" value="${ف['القطاع'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">نوع العطل</label>
+          <input type="text" id="تعديل_نوع_عطل_صيانة" value="${ف['نوع_العطل'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">وصف العطل</label>
+          <input type="text" id="تعديل_وصف_عطل_صيانة" value="${ف['وصف_العطل'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">الفني المسؤول</label>
+          <input type="text" id="تعديل_فني_صيانة" value="${ف['الفني_المسؤول'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">قطع الغيار</label>
+          <input type="text" id="تعديل_قطع_صيانة" value="${ف['قطع_الغيار'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">التكلفة الفعلية (ريال)</label>
+          <input type="number" id="تعديل_تكلفة_صيانة" value="${ف['التكلفة_التقديرية'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">حالة الإنجاز</label>
+          <select id="تعديل_حالة_صيانة" class="حقل-تعديل">
+            <option value="غير منجز" ${ف['حالة_الإنجاز']==='غير منجز'?'selected':''}>غير منجز</option>
+            <option value="قيد التنفيذ" ${ف['حالة_الإنجاز']==='قيد التنفيذ'?'selected':''}>قيد التنفيذ</option>
+            <option value="منجز" ${ف['حالة_الإنجاز']==='منجز'?'selected':''}>منجز</option>
           </select></div>
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">التكلفة الفعلية (ريال)</label>
-          <input type="number" id="تعديل_تكلفة_صيانة" value="${بيانات['التكلفة_التقديرية'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
-        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">ملاحظات</label>
-          <textarea id="تعديل_ملاحظات_صيانة" rows="3" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['ملاحظات'] || ''}</textarea></div>
+        <div style="grid-column:1/-1"><label class="تسمية-تعديل">ملاحظات</label>
+          <textarea id="تعديل_ملاحظات_صيانة" rows="3" class="حقل-تعديل">${ف['ملاحظات'] || ''}</textarea></div>
       </div>`;
   } else if (نوع === 'زيت') {
     بيانات = بيانات_تغيير_الزيت[فهرس];
     عنوان = '✏️ تعديل سجل تغيير الزيت - ' + (بيانات['رقم_الطلب'] || '');
+    var ف = بيانات;
     حقول = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">قراءة العداد (كم)</label>
-          <input type="number" id="تعديل_عداد_زيت" value="${بيانات['قراءة_العداد'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">نوع الزيت</label>
-          <input type="text" id="تعديل_نوع_زيت" value="${بيانات['نوع_الزيت'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
-        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">ملاحظات</label>
-          <textarea id="تعديل_ملاحظات_زيت" rows="3" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['ملاحظات'] || ''}</textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><label class="تسمية-تعديل">التاريخ</label>
+          <input type="date" id="تعديل_تاريخ_زيت" value="${ف['التاريخ'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">رقم اللوحة</label>
+          <input type="text" id="تعديل_لوحة_زيت" value="${ف['رقم_اللوحة'] || ''}" class="حقل-تعديل" readonly style="opacity:0.7"></div>
+        <div><label class="تسمية-تعديل">القطاع</label>
+          <input type="text" id="تعديل_قطاع_زيت" value="${ف['القطاع'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">نوع الزيت</label>
+          <select id="تعديل_نوع_زيت" class="حقل-تعديل">
+            <option value="5W-30" ${ف['نوع_الزيت']==='5W-30'?'selected':''}>5W-30</option>
+            <option value="5W-40" ${ف['نوع_الزيت']==='5W-40'?'selected':''}>5W-40</option>
+            <option value="10W-30" ${ف['نوع_الزيت']==='10W-30'?'selected':''}>10W-30</option>
+            <option value="10W-40" ${ف['نوع_الزيت']==='10W-40'?'selected':''}>10W-40</option>
+            <option value="15W-40" ${ف['نوع_الزيت']==='15W-40'?'selected':''}>15W-40</option>
+            <option value="0W-20" ${ف['نوع_الزيت']==='0W-20'?'selected':''}>0W-20</option>
+          </select></div>
+        <div><label class="تسمية-تعديل">قراءة العداد (كم)</label>
+          <input type="number" id="تعديل_عداد_زيت" value="${ف['قراءة_العداد'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">الفني المسؤول</label>
+          <input type="text" id="تعديل_فني_زيت" value="${ف['الفني_المسؤول'] || ''}" class="حقل-تعديل"></div>
+        <div style="grid-column:1/-1"><label class="تسمية-تعديل">ملاحظات</label>
+          <textarea id="تعديل_ملاحظات_زيت" rows="2" class="حقل-تعديل">${ف['ملاحظات'] || ''}</textarea></div>
       </div>`;
   } else if (نوع === 'رصد') {
     بيانات = بيانات_الرصد[فهرس];
     عنوان = '✏️ تعديل سجل الرصد - ' + (بيانات['رقم_اللوحة'] || '');
+    var ف = بيانات;
     حقول = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">الموقع الحالي</label>
-          <input type="text" id="تعديل_موقع_رصد" value="${بيانات['الموقع'] || ''}" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px"></div>
-        <div><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">حالة المركبة</label>
-          <select id="تعديل_حالة_رصد" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">
-            <option value="عاملة" ${بيانات['الحالة']==='عاملة'?'selected':''}>✅ عاملة</option>
-            <option value="خارج الخدمة" ${بيانات['الحالة']==='خارج الخدمة'?'selected':''}>❌ خارج الخدمة</option>
-            <option value="صيانة" ${بيانات['الحالة']==='صيانة'?'selected':''}>🔧 صيانة</option>
-            <option value="في مهمة" ${بيانات['الحالة']==='في مهمة'?'selected':''}>🚑 في مهمة</option>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><label class="تسمية-تعديل">التاريخ</label>
+          <input type="date" id="تعديل_تاريخ_رصد" value="${ف['التاريخ'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">الوقت</label>
+          <input type="time" id="تعديل_وقت_رصد" value="${ف['الوقت'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">رقم اللوحة</label>
+          <input type="text" id="تعديل_لوحة_رصد" value="${ف['رقم_اللوحة'] || ''}" class="حقل-تعديل" readonly style="opacity:0.7"></div>
+        <div><label class="تسمية-تعديل">القطاع</label>
+          <input type="text" id="تعديل_قطاع_رصد" value="${ف['القطاع'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">الموقع الحالي</label>
+          <input type="text" id="تعديل_موقع_رصد" value="${ف['الموقع'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">قراءة العداد (كم)</label>
+          <input type="number" id="تعديل_عداد_رصد" value="${ف['قراءة_العداد'] || ''}" class="حقل-تعديل"></div>
+        <div><label class="تسمية-تعديل">حالة المركبة</label>
+          <select id="تعديل_حالة_رصد" class="حقل-تعديل">
+            <option value="عاملة" ${ف['الحالة']==='عاملة'?'selected':''}>✅ عاملة</option>
+            <option value="خارج الخدمة" ${ف['الحالة']==='خارج الخدمة'?'selected':''}>❌ خارج الخدمة</option>
+            <option value="صيانة" ${ف['الحالة']==='صيانة'?'selected':''}>🔧 صيانة</option>
+            <option value="في مهمة" ${ف['الحالة']==='في مهمة'?'selected':''}>🚑 في مهمة</option>
           </select></div>
-        <div style="grid-column:1/-1"><label style="display:block;margin-bottom:4px;color:var(--نص-رمادي);font-size:0.85em">ملاحظات</label>
-          <textarea id="تعديل_ملاحظات_رصد" rows="2" style="width:100%;padding:8px;background:var(--خلفية-رئيسية);color:var(--نص-رئيسي);border:1px solid var(--حدود);border-radius:6px">${بيانات['ملاحظات'] || ''}</textarea></div>
+        <div style="grid-column:1/-1"><label class="تسمية-تعديل">ملاحظات</label>
+          <textarea id="تعديل_ملاحظات_رصد" rows="2" class="حقل-تعديل">${ف['ملاحظات'] || ''}</textarea></div>
       </div>`;
   }
 
@@ -1196,43 +1254,65 @@ function حفظ_التعديل() {
   if (نوع === 'حوادث') {
     var سجل = بيانات_الحوادث[فهرس];
     if (!سجل) return;
-    var نسبة_خطأ_el = document.getElementById('تعديل_نسبة_خطأ');
-    سجل['نوع_الحادث'] = document.getElementById('تعديل_نوع_الحادث') ? document.getElementById('تعديل_نوع_الحادث').value : سجل['نوع_الحادث'];
-    سجل['نسبة_الخطأ'] = نسبة_خطأ_el ? نسبة_خطأ_el.value + '%' : سجل['نسبة_الخطأ'];
-    سجل['الحالة'] = document.getElementById('تعديل_حالة_الحادث') ? document.getElementById('تعديل_حالة_الحادث').value : سجل['الحالة'];
-    سجل['رقم_التقرير'] = document.getElementById('تعديل_رقم_تقرير') ? document.getElementById('تعديل_رقم_تقرير').value : سجل['رقم_التقرير'];
-    سجل['وصف_الحادث'] = document.getElementById('تعديل_وصف_الحادث') ? document.getElementById('تعديل_وصف_الحادث').value : سجل['وصف_الحادث'];
-    سجل['الأضرار'] = document.getElementById('تعديل_الأضرار') ? document.getElementById('تعديل_الأضرار').value : سجل['الأضرار'];
+    function قيمة_حقل(id) { var el = document.getElementById(id); return el ? el.value : null; }
+    if (قيمة_حقل('تعديل_تاريخ_حادث') !== null) سجل['التاريخ'] = قيمة_حقل('تعديل_تاريخ_حادث');
+    if (قيمة_حقل('تعديل_وقت_حادث') !== null) سجل['الوقت'] = قيمة_حقل('تعديل_وقت_حادث');
+    if (قيمة_حقل('تعديل_نوع_الحادث') !== null) سجل['النوع'] = قيمة_حقل('تعديل_نوع_الحادث');
+    if (قيمة_حقل('تعديل_حالة_الحادث') !== null) سجل['الحالة'] = قيمة_حقل('تعديل_حالة_الحادث');
+    if (قيمة_حقل('تعديل_نسبة_خطأ') !== null) سجل['نسبة_الخطأ'] = parseInt(قيمة_حقل('تعديل_نسبة_خطأ')) || 0;
+    if (قيمة_حقل('تعديل_رقم_تقرير') !== null) سجل['رقم_التقرير'] = قيمة_حقل('تعديل_رقم_تقرير');
+    if (قيمة_حقل('تعديل_جهة_تقرير') !== null) سجل['الجهة_المصدرة'] = قيمة_حقل('تعديل_جهة_تقرير');
+    if (قيمة_حقل('تعديل_قطاع_حادث') !== null) سجل['القطاع'] = قيمة_حقل('تعديل_قطاع_حادث');
+    if (قيمة_حقل('تعديل_وصف_الحادث') !== null) سجل['وصف_الحادث'] = قيمة_حقل('تعديل_وصف_الحادث');
+    if (قيمة_حقل('تعديل_الأضرار') !== null) سجل['الأضرار'] = قيمة_حقل('تعديل_الأضرار');
     سجل['تاريخ_التحديث'] = new Date().toLocaleString('ar-SA');
     تحديث_جدول_الحوادث();
     تحديث_لوحة_القائد();
   } else if (نوع === 'صيانة') {
     var سجل = بيانات_الصيانة_الوقائية[فهرس];
     if (!سجل) return;
-    سجل['حالة_الإنجاز'] = document.getElementById('تعديل_حالة_صيانة') ? document.getElementById('تعديل_حالة_صيانة').value : سجل['حالة_الإنجاز'];
-    سجل['التكلفة_التقديرية'] = document.getElementById('تعديل_تكلفة_صيانة') ? document.getElementById('تعديل_تكلفة_صيانة').value : سجل['التكلفة_التقديرية'];
-    سجل['ملاحظات'] = document.getElementById('تعديل_ملاحظات_صيانة') ? document.getElementById('تعديل_ملاحظات_صيانة').value : سجل['ملاحظات'];
+    function قيمة_حقل2(id) { var el = document.getElementById(id); return el ? el.value : null; }
+    if (قيمة_حقل2('تعديل_تاريخ_صيانة') !== null) سجل['التاريخ'] = قيمة_حقل2('تعديل_تاريخ_صيانة');
+    if (قيمة_حقل2('تعديل_قطاع_صيانة') !== null) سجل['القطاع'] = قيمة_حقل2('تعديل_قطاع_صيانة');
+    if (قيمة_حقل2('تعديل_نوع_عطل_صيانة') !== null) سجل['نوع_العطل'] = قيمة_حقل2('تعديل_نوع_عطل_صيانة');
+    if (قيمة_حقل2('تعديل_وصف_عطل_صيانة') !== null) سجل['وصف_العطل'] = قيمة_حقل2('تعديل_وصف_عطل_صيانة');
+    if (قيمة_حقل2('تعديل_فني_صيانة') !== null) سجل['الفني_المسؤول'] = قيمة_حقل2('تعديل_فني_صيانة');
+    if (قيمة_حقل2('تعديل_قطع_صيانة') !== null) سجل['قطع_الغيار'] = قيمة_حقل2('تعديل_قطع_صيانة');
+    if (قيمة_حقل2('تعديل_تكلفة_صيانة') !== null) سجل['التكلفة_التقديرية'] = قيمة_حقل2('تعديل_تكلفة_صيانة');
+    if (قيمة_حقل2('تعديل_حالة_صيانة') !== null) سجل['حالة_الإنجاز'] = قيمة_حقل2('تعديل_حالة_صيانة');
+    if (قيمة_حقل2('تعديل_ملاحظات_صيانة') !== null) سجل['ملاحظات'] = قيمة_حقل2('تعديل_ملاحظات_صيانة');
     سجل['تاريخ_التحديث'] = new Date().toLocaleString('ar-SA');
     تحديث_جدول_الصيانة();
     تحديث_لوحة_القائد();
   } else if (نوع === 'زيت') {
     var سجل = بيانات_تغيير_الزيت[فهرس];
     if (!سجل) return;
-    var عداد_جديد = parseInt(document.getElementById('تعديل_عداد_زيت') ? document.getElementById('تعديل_عداد_زيت').value : 0) || 0;
+    function قيمة_حقل3(id) { var el = document.getElementById(id); return el ? el.value : null; }
+    if (قيمة_حقل3('تعديل_تاريخ_زيت') !== null) سجل['التاريخ'] = قيمة_حقل3('تعديل_تاريخ_زيت');
+    if (قيمة_حقل3('تعديل_قطاع_زيت') !== null) سجل['القطاع'] = قيمة_حقل3('تعديل_قطاع_زيت');
+    if (قيمة_حقل3('تعديل_نوع_زيت') !== null) سجل['نوع_الزيت'] = قيمة_حقل3('تعديل_نوع_زيت');
+    if (قيمة_حقل3('تعديل_فني_زيت') !== null) سجل['الفني_المسؤول'] = قيمة_حقل3('تعديل_فني_زيت');
+    if (قيمة_حقل3('تعديل_ملاحظات_زيت') !== null) سجل['ملاحظات'] = قيمة_حقل3('تعديل_ملاحظات_زيت');
+    var عداد_جديد = parseInt(قيمة_حقل3('تعديل_عداد_زيت')) || سجل['قراءة_العداد'] || 0;
     سجل['قراءة_العداد'] = عداد_جديد;
     سجل['الموعد_القادم_كم'] = عداد_جديد + 5000;
-    سجل['نوع_الزيت'] = document.getElementById('تعديل_نوع_زيت') ? document.getElementById('تعديل_نوع_زيت').value : سجل['نوع_الزيت'];
-    سجل['ملاحظات'] = document.getElementById('تعديل_ملاحظات_زيت') ? document.getElementById('تعديل_ملاحظات_زيت').value : سجل['ملاحظات'];
     سجل['تاريخ_التحديث'] = new Date().toLocaleString('ar-SA');
     تحديث_جدول_تغيير_الزيت();
     فحص_تنبيهات_الزيت();
+    تحديث_لوحة_القائد();
   } else if (نوع === 'رصد') {
     var سجل = بيانات_الرصد[فهرس];
     if (!سجل) return;
-    سجل['الموقع'] = document.getElementById('تعديل_موقع_رصد') ? document.getElementById('تعديل_موقع_رصد').value : سجل['الموقع'];
-    سجل['الحالة'] = document.getElementById('تعديل_حالة_رصد') ? document.getElementById('تعديل_حالة_رصد').value : سجل['الحالة'];
-    سجل['ملاحظات'] = document.getElementById('تعديل_ملاحظات_رصد') ? document.getElementById('تعديل_ملاحظات_رصد').value : سجل['ملاحظات'];
+    function قيمة_حقل4(id) { var el = document.getElementById(id); return el ? el.value : null; }
+    if (قيمة_حقل4('تعديل_تاريخ_رصد') !== null) سجل['التاريخ'] = قيمة_حقل4('تعديل_تاريخ_رصد');
+    if (قيمة_حقل4('تعديل_وقت_رصد') !== null) سجل['الوقت'] = قيمة_حقل4('تعديل_وقت_رصد');
+    if (قيمة_حقل4('تعديل_قطاع_رصد') !== null) سجل['القطاع'] = قيمة_حقل4('تعديل_قطاع_رصد');
+    if (قيمة_حقل4('تعديل_موقع_رصد') !== null) سجل['الموقع'] = قيمة_حقل4('تعديل_موقع_رصد');
+    if (قيمة_حقل4('تعديل_عداد_رصد') !== null) سجل['قراءة_العداد'] = parseInt(قيمة_حقل4('تعديل_عداد_رصد')) || سجل['قراءة_العداد'];
+    if (قيمة_حقل4('تعديل_حالة_رصد') !== null) سجل['الحالة'] = قيمة_حقل4('تعديل_حالة_رصد');
+    if (قيمة_حقل4('تعديل_ملاحظات_رصد') !== null) سجل['ملاحظات'] = قيمة_حقل4('تعديل_ملاحظات_رصد');
     سجل['تاريخ_التحديث'] = new Date().toLocaleString('ar-SA');
+    تحديث_لوحة_القائد();
   }
 
   حفظ_في_شيت(
