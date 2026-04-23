@@ -1094,7 +1094,7 @@ function تعديل_سجل(نوع, فهرس) {
     عنوان = '✏️ تعديل سجل الحادث - ' + (بيانات['رقم_الطلب'] || '');
     var ف = بيانات;
     حقول = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="شبكة-تعديل">
         <div><label class="تسمية-تعديل">التاريخ</label>
           <input type="date" id="تعديل_تاريخ_حادث" value="${ف['التاريخ'] || ''}" class="حقل-تعديل"></div>
         <div><label class="تسمية-تعديل">الوقت</label>
@@ -1131,9 +1131,9 @@ function تعديل_سجل(نوع, فهرس) {
           </select></div>
         <div><label class="تسمية-تعديل">القطاع</label>
           <input type="text" id="تعديل_قطاع_حادث" value="${ف['القطاع'] || ''}" class="حقل-تعديل"></div>
-        <div style="grid-column:1/-1"><label class="تسمية-تعديل">وصف الحادث</label>
+        <div class="عرض-كامل"><label class="تسمية-تعديل">وصف الحادث</label>
           <textarea id="تعديل_وصف_الحادث" rows="3" class="حقل-تعديل">${ف['وصف_الحادث'] || ''}</textarea></div>
-        <div style="grid-column:1/-1"><label class="تسمية-تعديل">الأضرار</label>
+        <div class="عرض-كامل"><label class="تسمية-تعديل">الأضرار</label>
           <textarea id="تعديل_الأضرار" rows="2" class="حقل-تعديل">${ف['الأضرار'] || ''}</textarea></div>
       </div>`;
   } else if (نوع === 'صيانة') {
@@ -1141,7 +1141,7 @@ function تعديل_سجل(نوع, فهرس) {
     عنوان = '✏️ تعديل سجل الصيانة - ' + (بيانات['رقم_الطلب'] || '');
     var ف = بيانات;
     حقول = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="شبكة-تعديل">
         <div><label class="تسمية-تعديل">التاريخ</label>
           <input type="date" id="تعديل_تاريخ_صيانة" value="${ف['التاريخ'] || ''}" class="حقل-تعديل"></div>
         <div><label class="تسمية-تعديل">رقم اللوحة</label>
@@ -1166,7 +1166,7 @@ function تعديل_سجل(نوع, فهرس) {
             <option value="قيد التنفيذ" ${ف['حالة_الإنجاز']==='قيد التنفيذ'?'selected':''}>قيد التنفيذ</option>
             <option value="منجز" ${ف['حالة_الإنجاز']==='منجز'?'selected':''}>منجز</option>
           </select></div>
-        <div style="grid-column:1/-1"><label class="تسمية-تعديل">ملاحظات</label>
+        <div class="عرض-كامل"><label class="تسمية-تعديل">ملاحظات</label>
           <textarea id="تعديل_ملاحظات_صيانة" rows="3" class="حقل-تعديل">${ف['ملاحظات'] || ''}</textarea></div>
       </div>`;
   } else if (نوع === 'زيت') {
@@ -1174,7 +1174,7 @@ function تعديل_سجل(نوع, فهرس) {
     عنوان = '✏️ تعديل سجل تغيير الزيت - ' + (بيانات['رقم_الطلب'] || '');
     var ف = بيانات;
     حقول = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="شبكة-تعديل">
         <div><label class="تسمية-تعديل">التاريخ</label>
           <input type="date" id="تعديل_تاريخ_زيت" value="${ف['التاريخ'] || ''}" class="حقل-تعديل"></div>
         <div><label class="تسمية-تعديل">رقم اللوحة</label>
@@ -1194,7 +1194,7 @@ function تعديل_سجل(نوع, فهرس) {
           <input type="number" id="تعديل_عداد_زيت" value="${ف['قراءة_العداد'] || ''}" class="حقل-تعديل"></div>
         <div><label class="تسمية-تعديل">الفني المسؤول</label>
           <input type="text" id="تعديل_فني_زيت" value="${ف['الفني_المسؤول'] || ''}" class="حقل-تعديل"></div>
-        <div style="grid-column:1/-1"><label class="تسمية-تعديل">ملاحظات</label>
+        <div class="عرض-كامل"><label class="تسمية-تعديل">ملاحظات</label>
           <textarea id="تعديل_ملاحظات_زيت" rows="2" class="حقل-تعديل">${ف['ملاحظات'] || ''}</textarea></div>
       </div>`;
   } else if (نوع === 'رصد') {
@@ -1202,7 +1202,7 @@ function تعديل_سجل(نوع, فهرس) {
     عنوان = '✏️ تعديل سجل الرصد - ' + (بيانات['رقم_اللوحة'] || '');
     var ف = بيانات;
     حقول = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="شبكة-تعديل">
         <div><label class="تسمية-تعديل">التاريخ</label>
           <input type="date" id="تعديل_تاريخ_رصد" value="${ف['التاريخ'] || ''}" class="حقل-تعديل"></div>
         <div><label class="تسمية-تعديل">الوقت</label>
@@ -1222,7 +1222,7 @@ function تعديل_سجل(نوع, فهرس) {
             <option value="صيانة" ${ف['الحالة']==='صيانة'?'selected':''}>🔧 صيانة</option>
             <option value="في مهمة" ${ف['الحالة']==='في مهمة'?'selected':''}>🚑 في مهمة</option>
           </select></div>
-        <div style="grid-column:1/-1"><label class="تسمية-تعديل">ملاحظات</label>
+        <div class="عرض-كامل"><label class="تسمية-تعديل">ملاحظات</label>
           <textarea id="تعديل_ملاحظات_رصد" rows="2" class="حقل-تعديل">${ف['ملاحظات'] || ''}</textarea></div>
       </div>`;
   }
