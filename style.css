@@ -1228,111 +1228,326 @@ tbody td {
 }
 
 
-/* ====== نافذة التعديل المحسّنة ====== */
-.تسمية-تعديل {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--نص-رمادي);
-  font-size: 0.82em;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* ====== نافذة التعديل الكاملة ====== */
+
+/* خلفية النافذة المنبثقة */
+#نافذة_التعديل {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 2000;
+  overflow-y: auto;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-.حقل-تعديل {
-  width: 100%;
-  padding: 9px 12px;
-  background: var(--خلفية-رئيسية);
-  color: var(--نص-رئيسي);
-  border: 1px solid var(--حدود);
-  border-radius: 8px;
-  font-family: 'Cairo', sans-serif;
-  font-size: 0.9em;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
-}
-
-.حقل-تعديل:focus {
-  outline: none;
-  border-color: var(--أخضر-فاتح);
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
-}
-
-.حقل-تعديل[readonly] {
-  background: rgba(255,255,255,0.03);
-  cursor: not-allowed;
-}
-
-textarea.حقل-تعديل {
-  resize: vertical;
-  min-height: 70px;
-}
-
-/* تحسين نافذة التعديل */
+/* محتوى النافذة */
 #نافذة_التعديل > div {
-  background: var(--خلفية-ثانوية);
+  background: var(--bg-card);
   border-radius: 16px;
   padding: 28px;
-  max-width: 700px;
-  margin: 30px auto;
-  border: 1px solid var(--حدود);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  animation: ظهور-نافذة 0.25s ease;
+  max-width: 750px;
+  width: 100%;
+  margin: 20px auto;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: modal-appear 0.25s ease;
+  position: relative;
 }
 
-@keyframes ظهور-نافذة {
+@keyframes modal-appear {
   from { opacity: 0; transform: translateY(-20px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* رأس النافذة */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--srca-green-light);
+}
+
+.modal-close-btn {
+  background: rgba(218,55,51,0.15);
+  border: 1px solid rgba(218,55,51,0.3);
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* شبكة حقول التعديل */
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-grid .full-col {
+  grid-column: 1 / -1;
+}
+
+/* تسمية الحقل */
+.modal-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* حقول الإدخال داخل النافذة */
+.modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  direction: rtl;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: var(--srca-green);
+  box-shadow: 0 0 0 3px rgba(26,122,60,0.2);
+}
+
+.modal-input[readonly] {
+  background: rgba(255,255,255,0.03);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+textarea.modal-input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* أزرار النافذة */
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.modal-footer .btn {
+  min-width: 120px;
+}
+
 /* ====== تحسينات التصميم المتجاوب الشامل ====== */
-@media (max-width: 1024px) {
-  .شبكة-نموذج {
-    grid-template-columns: 1fr 1fr !important;
-  }
+
+/* كمبيوتر كبير جداً */
+@media (min-width: 1400px) {
+  .main { max-width: 1600px; }
 }
 
-@media (max-width: 768px) {
+/* تابلت كبير */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .sidebar { width: 240px; min-width: 240px; }
+  .form-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* تابلت (iPad) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  body { display: flex; }
+  .sidebar { width: 220px; min-width: 220px; }
+  .sidebar-title { font-size: 11px; }
+  .sidebar-logo { width: 55px; height: 55px; font-size: 28px; }
+  .form-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-group.full-width { grid-column: 1 / -1; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .main { padding: 15px; }
+  .page-header h2 { font-size: 15px; }
+  .charts-grid { grid-template-columns: repeat(2, 1fr); }
+  /* نافذة التعديل على التابلت */
+  #نافذة_التعديل > div { max-width: 650px; padding: 22px; }
+  .modal-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* جوال (أقل من 768px) */
+@media (max-width: 767px) {
+  body { display: block; }
+  
+  /* الشريط الجانبي */
+  .sidebar {
+    position: fixed;
+    right: -300px;
+    top: 0;
+    width: 280px;
+    min-width: 280px;
+    height: 100vh;
+    z-index: 500;
+    transition: right 0.3s ease;
+    box-shadow: -5px 0 30px rgba(0,0,0,0.6);
+  }
+  .sidebar.open { right: 0; }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 499;
+  }
+  .sidebar-overlay.show { display: block; }
+
+  /* زر القائمة */
+  .mobile-menu-btn {
+    display: flex !important;
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 498;
+    background: var(--srca-green);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(26,122,60,0.5);
+    align-items: center;
+    gap: 6px;
+  }
+  .mobile-menu-btn span { font-size: 12px; font-family: 'Cairo', sans-serif; font-weight: 700; }
+
+  /* المحتوى الرئيسي */
+  .main {
+    padding: 10px;
+    padding-top: 65px;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  /* رأس الصفحة */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 15px;
+  }
+  .page-header h2 { font-size: 14px; }
+  .page-header-actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .page-header-actions .btn {
+    flex: 1;
+    min-width: 90px;
+    justify-content: center;
+    font-size: 11px;
+    padding: 8px 8px;
+  }
+
+  /* بطاقات الإحصاء */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 12px 10px; }
+  .stat-value { font-size: 22px; }
+  .stat-icon { font-size: 20px; }
+  .stat-label { font-size: 10px; }
+
+  /* النماذج */
+  .form-container { padding: 15px; }
+  .form-title { font-size: 14px; }
+  .form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .form-group.full-width { grid-column: 1; }
+  input, select, textarea {
+    font-size: 14px;
+    padding: 11px 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-submit { font-size: 15px; padding: 14px; }
+
+  /* الجداول */
+  .table-container { border-radius: 10px; }
+  .table-header { padding: 12px 15px; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .table-header .btn { font-size: 11px; padding: 6px 10px; }
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 600px; }
+  thead th { font-size: 10px; padding: 8px 6px; white-space: nowrap; }
+  tbody td { font-size: 11px; padding: 8px 6px; }
+  td button { padding: 4px 8px !important; font-size: 11px !important; }
+
+  /* شريط الفلتر */
+  .filter-bar { flex-direction: column; gap: 10px; }
+  .filter-group { min-width: unset !important; width: 100%; }
+
+  /* الرسوم البيانية */
+  .charts-grid { grid-template-columns: 1fr; }
+
+  /* التقارير */
+  .report-tabs { gap: 5px; flex-wrap: wrap; }
+  .report-tab { padding: 6px 12px; font-size: 11px; }
+  .report-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .report-header { flex-direction: column; text-align: center; gap: 10px; }
+
+  /* الرسائل المنبثقة */
+  #حاوية_الرسائل { left: 10px; right: 10px; max-width: unset; }
+
   /* نافذة التعديل على الجوال */
-  #نافذة_التعديل > div {
-    margin: 10px;
-    padding: 18px;
-    border-radius: 12px;
-  }
-  #نافذة_التعديل > div > div:first-child + div {
-    grid-template-columns: 1fr !important;
-  }
-  
-  /* الجداول على الجوال */
-  .جدول-متجاوب {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 8px;
-  }
-  
-  /* أزرار الإجراء في الجداول */
-  td button {
-    padding: 5px 10px !important;
-    font-size: 0.8em !important;
-  }
-}
-
-@media (max-width: 480px) {
-  /* نافذة التعديل على الجوال الصغير */
-  #نافذة_التعديل {
-    padding: 8px !important;
-  }
+  #نافذة_التعديل { padding: 10px; }
   #نافذة_التعديل > div {
     margin: 0;
-    border-radius: 10px;
-    padding: 15px;
+    padding: 18px;
+    border-radius: 12px;
+    max-width: 100%;
   }
-  
-  /* حقول النماذج */
-  .شبكة-نموذج {
-    grid-template-columns: 1fr !important;
-  }
-  .مجموعة-حقل.عرض-كامل {
-    grid-column: 1 !important;
-  }
+  .modal-grid { grid-template-columns: 1fr; }
+  .modal-grid .full-col { grid-column: 1; }
+  .modal-footer { flex-direction: column; }
+  .modal-footer .btn { width: 100%; justify-content: center; }
+
+  /* بطاقة معلومات المركبة */
+  .vehicle-info-card { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* جوال صغير جداً */
+@media (max-width: 479px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-card { padding: 10px 8px; }
+  .stat-value { font-size: 18px; }
+  .main { padding: 8px; padding-top: 60px; }
+  .form-container { padding: 12px; }
+  .btn { font-size: 11px; padding: 7px 10px; }
+  .mobile-menu-btn { top: 10px; right: 10px; padding: 8px 12px; font-size: 16px; }
+  table { min-width: 500px; }
+  .modal-title { font-size: 14px; }
+}
+
+/* تحسينات اللمس للجوال */
+@media (hover: none) and (pointer: coarse) {
+  .nav-btn { padding: 13px 14px; }
+  .btn { min-height: 40px; }
+  input, select, textarea { min-height: 44px; }
+  .btn-submit { min-height: 50px; }
+  tbody tr { min-height: 44px; }
+  .modal-input { min-height: 44px; }
 }
