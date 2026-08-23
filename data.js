@@ -5,7 +5,7 @@
 // ============================================================
 
 // ====== إعدادات الربط بـ Google Sheets ======
-var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDFRlRvIi_uRMZvcTF365ncbQ4AVFU0iD9kNMmbRMhZZ_TSPNDVCAlpWZ_uOLQCgs/exec";
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8e8X6ulC3On1LipwL2dLqfIr30AFCg5Fzwvk7FeSi0NDNuseHg3Guyu59v2vzYzU/exec";
 
 // أسماء الشيتات بالعربية
 var اسماء_الشيتات = {
