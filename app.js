@@ -158,7 +158,7 @@ function تحميل_كل_البيانات_دفعة_واحدة() {
     }
   };
   var script = document.createElement('script');
-  script.src = SCRIPT_URL + '?action=dashboard&callback=' + اسم_callback;
+  script.src = SCRIPT_URL + '?action=dashboard&callback=' + اسم_callback + '&ts=' + Date.now();
   script.onerror = function() {
     try { delete window[اسم_callback]; } catch(e) {}
     وضع_الاتصال = false;
@@ -201,7 +201,7 @@ function تحميل_سجلات_حديثة(اسم_الشيت, النوع) {
     تحديث_لوحة_القائد();
   };
   var script = document.createElement('script');
-  script.src = SCRIPT_URL + '?action=page&sheet=' + encodeURIComponent(اسم_الشيت) + '&limit=300&callback=' + اسم_callback;
+  script.src = SCRIPT_URL + '?action=page&sheet=' + encodeURIComponent(اسم_الشيت) + '&limit=300&callback=' + اسم_callback + '&ts=' + Date.now();
   script.onerror = function() { try { delete window[اسم_callback]; } catch(e) {} تحميل_مرحلي[النوع] = false; };
   document.head.appendChild(script);
 }
