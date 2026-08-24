@@ -158,7 +158,7 @@ function تحميل_كل_البيانات_دفعة_واحدة() {
     }
   };
   var script = document.createElement('script');
-  script.src = SCRIPT_URL + '?action=getAll&callback=' + اسم_callback;
+  script.src = SCRIPT_URL + '?action=dashboard&callback=' + اسم_callback;
   script.onerror = function() {
     try { delete window[اسم_callback]; } catch(e) {}
     وضع_الاتصال = false;
@@ -177,7 +177,33 @@ function تحميل_كل_البيانات_دفعة_واحدة() {
       تحديث_حالة_الاتصال();
       إخفاء_تحميل();
     }
-  }, 30000);
+  }, 45000);
+}
+
+// ====== تحميل مرحلي للسجلات الكبيرة ======
+var تحميل_مرحلي = { رصد: false, زيت: false };
+function تحميل_سجلات_حديثة(اسم_الشيت, النوع) {
+  if (!وضع_الاتصال || تحميل_مرحلي[النوع]) return;
+  تحميل_مرحلي[النوع] = true;
+  var اسم_callback = 'cb_page_' + النوع + '_' + Date.now();
+  window[اسم_callback] = function(استجابة) {
+    try { delete window[اسم_callback]; } catch(e) {}
+    تحميل_مرحلي[النوع] = false;
+    if (!استجابة || استجابة.status !== 'success' || !Array.isArray(استجابة.rows)) return;
+    var صفوف = استجابة.rows.slice().reverse();
+    if (النوع === 'زيت') {
+      بيانات_تغيير_الزيت = صفوف;
+      تحديث_جدول_تغيير_الزيت();
+      فحص_تنبيهات_الزيت();
+    } else if (النوع === 'رصد') {
+      بيانات_الرصد = تطبيع_مجموعة_قادمة(صفوف, 'رصد');
+    }
+    تحديث_لوحة_القائد();
+  };
+  var script = document.createElement('script');
+  script.src = SCRIPT_URL + '?action=page&sheet=' + encodeURIComponent(اسم_الشيت) + '&limit=300&callback=' + اسم_callback;
+  script.onerror = function() { try { delete window[اسم_callback]; } catch(e) {} تحميل_مرحلي[النوع] = false; };
+  document.head.appendChild(script);
 }
 
 // ====== تحميل شيت واحد (للتوافق) ======
@@ -727,6 +753,9 @@ function عرض_القسم(اسم_القسم) {
   if (القسم) القسم.classList.add('نشط');
   var الزر = document.getElementById('زر_' + اسم_القسم);
   if (الزر) الزر.classList.add('نشط');
+  // تُحمّل سجلات الزيت والرصد على مراحل للحفاظ على سرعة لوحة القائد.
+  if (اسم_القسم === 'الزيت' && بيانات_تغيير_الزيت.length === 0) تحميل_سجلات_حديثة('تغيير الزيت', 'زيت');
+  if (اسم_القسم === 'الرصد' && بيانات_الرصد.length === 0) تحميل_سجلات_حديثة('رصد المركبات', 'رصد');
   // إغلاق القائمة في الجوال
   var القائمة_الجانبية = document.getElementById('القائمة_الجانبية');
   if (القائمة_الجانبية) القائمة_الجانبية.classList.remove('مفتوحة');
