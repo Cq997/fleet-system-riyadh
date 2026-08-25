@@ -545,6 +545,70 @@ table { width: 100%; min-width: 550px; }
 .حدث-مركبة:before { content:''; position:absolute; right:-22px; top:15px; width:10px; height:10px; border-radius:50%; background:var(--أخضر); border:2px solid #0f2518; }
 .حدث-مركبة .تاريخ-حدث { color:var(--نص-رمادي); font-size:.78rem; }
 @media (max-width:768px) { .قائمة-اصلاحات { grid-template-columns:1fr 1fr; } .صف-إضافة-إصلاح { flex-direction:column; align-items:stretch; } }
+
+/* ====== المظهر الأبيض الاحترافي ====== */
+:root {
+  --أخضر-داكن: #1f2937;
+  --أخضر-رئيسي: #0f766e;
+  --أخضر-فاتح: #0d9488;
+  --أخضر: #0f766e;
+  --أحمر: #dc2626;
+  --ذهبي: #b7791f;
+  --خلفية-رئيسية: #f6f8fb;
+  --خلفية-ثانوية: #ffffff;
+  --خلفية-بطاقة: #ffffff;
+  --خلفية-حقل: #ffffff;
+  --حدود: #dbe3ee;
+  --نص-رئيسي: #172033;
+  --نص-ثانوي: #334155;
+  --نص-رمادي: #64748b;
+  --ظل: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+html, body { background:var(--خلفية-رئيسية); color:var(--نص-رئيسي); }
+.شريط-جانبي { background:#ffffff; border-left-color:var(--حدود); box-shadow:-1px 0 0 rgba(15,23,42,.03); }
+.رأس-الشريط { background:linear-gradient(135deg,#ffffff,#f3f7f8); border-bottom-color:#d4a017; }
+.عنوان-الشريط { color:#172033; }
+.عنوان-فرعي-الشريط { color:#64748b; }
+.زر-قائمة-جانبية { color:#475569; }
+.زر-قائمة-جانبية:hover { background:#f1f7f7; color:#0f766e; }
+.زر-قائمة-جانبية.نشط { background:#e7f4f2; color:#0f766e; border-right-color:#0f766e; }
+.رأس-الصفحة h2, .قيمة-احصاء, .رقم-احصاء-تقرير { color:#172033; }
+.زر-ثانوي { background:#ffffff; color:#334155; border-color:#cbd5e1; }
+.زر-ثانوي:hover { background:#f1f5f9; }
+.شريط-فلتر, .بطاقة-احصاء, .بطاقة-رسم, .حاوية-جدول, .حاوية-نموذج, .تقرير-كامل { box-shadow:var(--ظل); }
+.مجموعة-فلتر input, .مجموعة-فلتر select, .مجموعة-حقل input, .مجموعة-حقل select, .مجموعة-حقل textarea, .حقل-بحث-لوحة { background:#ffffff; color:#172033; }
+.مجموعة-فلتر input:focus, .مجموعة-فلتر select:focus, .مجموعة-حقل input:focus, .مجموعة-حقل select:focus, .مجموعة-حقل textarea:focus, .حقل-بحث-لوحة:focus { background:#ffffff; border-color:#0f766e; box-shadow:0 0 0 3px rgba(15,118,110,.12); }
+.مجموعة-حقل input[readonly] { background:#f8fafc; color:#64748b; }
+thead th, .جدول-تقرير th { background:#1f2937; color:#ffffff; }
+tbody tr { border-bottom-color:#e2e8f0; }
+tbody tr:hover { background:#f0fdfa; }
+.قائمة-نتائج-لوحة { background:#ffffff; border-color:#0f766e; box-shadow:0 8px 24px rgba(15,23,42,.15); }
+.عنصر-نتيجة-لوحة { color:#172033; border-bottom-color:#e2e8f0; }
+.عنصر-نتيجة-لوحة:hover, .عنصر-نتيجة-لوحة.محدد { background:#e7f4f2; color:#0f766e; }
+.قيمة-مختارة-لوحة { background:#e7f4f2; border-color:#0f766e; color:#0f766e; }
+.بطاقة-معلومات-مركبة, .لوحة-اصلاحات, .بطاقة-ملف-مركبة { background:#f7fbfb; border-color:#cfe8e5; }
+.خيار-اصلاح, .حدث-مركبة { background:#ffffff; border-color:#e2e8f0; box-shadow:0 2px 8px rgba(15,23,42,.04); }
+.معلومات-زيت-ضمن-صيانة { background:#f0f9ff; border:1px solid #bae6fd; }
+.مسار-المركبة { border-right-color:#0f766e; }
+.حدث-مركبة:before { background:#0f766e; border-color:#ffffff; }
+.مؤشر-زيت { background:#f8fafc; }
+.شريط-تقدم-زيت { background:#e2e8f0; }
+.تبويب-تقرير { background:#ffffff; color:#64748b; }
+.تقرير-كامل, .بطاقة-احصاء-تقرير { background:#ffffff; }
+.رسالة.نجاح { background:#ecfdf5; color:#047857; border-color:#a7f3d0; }
+.رسالة.تحذير { background:#fffbeb; color:#b45309; border-color:#fde68a; }
+.رسالة.خطر { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+.رسالة.معلومة { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+#شاشة_التحميل { background:rgba(255,255,255,.94); }
+.نص-تحميل { color:#334155; }
+.نافذة-تعديل-محتوى { background:#ffffff; border-color:#dbe3ee; box-shadow:0 20px 60px rgba(15,23,42,.18); }
+.نافذة-تعديل-رأس, .نافذة-تعديل-أزرار { border-color:#e2e8f0; }
+.نافذة-تعديل-عنوان { color:#0f766e; }
+.تسمية-تعديل { color:#64748b; }
+.حقل-تعديل { background:#ffffff; border-color:#cbd5e1; color:#172033; }
+.حقل-تعديل:focus { border-color:#0f766e; background:#ffffff; box-shadow:0 0 0 3px rgba(15,118,110,.12); }
+.طبقة-شريط-جانبي { background:rgba(15,23,42,.35); }
+@media (max-width:768px) { .شريط-جانبي { box-shadow:-5px 0 20px rgba(15,23,42,.16); } }
 </style>
 </head>
 <body>
@@ -607,7 +671,7 @@ table { width: 100%; min-width: 550px; }
   </nav>
   <div class="تذييل-الشريط">
     <div>👤 ثامر عياد الحربي</div>
-    <div>💻</div>
+    <div>💻 000</div>
     <div id="حالة_الاتصال" class="حالة-الاتصال غير-متصل">
       <span class="نقطة-الحالة"></span>
       <span id="نص_الحالة">جاري الاتصال...</span>
@@ -748,7 +812,7 @@ table { width: 100%; min-width: 550px; }
 =========================================== -->
 <section id="قسم_الأسطول" class="قسم-محتوى">
   <div class="رأس-الصفحة">
-    <h2>🚑  الأسطول</h2>
+    <h2>🚑 الأسطول</h2>
     <div class="أزرار-رأس-الصفحة">
       <span id="عداد_الاسطول" style="font-size:12px;color:var(--نص-رمادي)"></span>
       <button class="زر زر-تصدير" onclick="window.print()">📄 طباعة</button>
@@ -1448,7 +1512,7 @@ table { width: 100%; min-width: 550px; }
 <script src="data.js?v=4.2"></script>
 <script>
 // رابط Google Apps Script - يتم تحديثه هنا
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfF4wo1Q-E_VXsVhAGEmhNlYRu834N0sVvfiRpKIMvFFjEuqWPO4w-INZA_QzNCKo/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgDb9ZI9k7Ccws8zcGr78H5UHXWLgNzRKBTyGIfINsOg2hqxLXkvuatF7eKJtr-Y8/exec';
 
 // دوال مساعدة إضافية
 function تغيير_نوع_التقرير() {
