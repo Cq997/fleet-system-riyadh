@@ -529,6 +529,22 @@ table { width: 100%; min-width: 550px; }
   .نافذة-تعديل-أزرار { flex-direction:column-reverse; }
   .نافذة-تعديل-أزرار .زر { width:100%; justify-content:center; }
 }
+/* ====== إصلاحات الصيانة وملف المركبة ====== */
+.لوحة-اصلاحات { background:rgba(39,174,96,.07); border:1px solid rgba(39,174,96,.28); border-radius:10px; padding:14px; }
+.قائمة-اصلاحات { display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr)); gap:8px; margin-top:10px; }
+.خيار-اصلاح { display:flex; align-items:center; gap:8px; background:rgba(9,34,20,.66); border:1px solid rgba(255,255,255,.08); border-radius:7px; padding:8px; font-size:.86rem; cursor:pointer; }
+.خيار-اصلاح input { width:auto; accent-color:var(--أخضر); }
+.صف-إضافة-إصلاح { display:flex; gap:8px; margin-top:12px; align-items:center; flex-wrap:wrap; }
+.صف-إضافة-إصلاح select,.صف-إضافة-إصلاح input { flex:1; min-width:180px; }
+.معلومات-زيت-ضمن-صيانة { background:rgba(26,74,74,.35); border-radius:8px; padding:12px; margin-top:10px; }
+.رأس-ملف-مركبة { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:12px 0 18px; }
+.بطاقة-ملف-مركبة { background:rgba(39,174,96,.08); border:1px solid rgba(39,174,96,.24); border-radius:9px; padding:10px; }
+.بطاقة-ملف-مركبة span { display:block; color:var(--نص-رمادي); font-size:.76rem; margin-bottom:4px; }
+.مسار-المركبة { border-right:2px solid var(--أخضر); margin:10px 8px; padding-right:15px; }
+.حدث-مركبة { position:relative; background:rgba(255,255,255,.035); border-radius:8px; padding:10px; margin-bottom:9px; }
+.حدث-مركبة:before { content:''; position:absolute; right:-22px; top:15px; width:10px; height:10px; border-radius:50%; background:var(--أخضر); border:2px solid #0f2518; }
+.حدث-مركبة .تاريخ-حدث { color:var(--نص-رمادي); font-size:.78rem; }
+@media (max-width:768px) { .قائمة-اصلاحات { grid-template-columns:1fr 1fr; } .صف-إضافة-إصلاح { flex-direction:column; align-items:stretch; } }
 </style>
 </head>
 <body>
@@ -732,7 +748,7 @@ table { width: 100%; min-width: 550px; }
 =========================================== -->
 <section id="قسم_الأسطول" class="قسم-محتوى">
   <div class="رأس-الصفحة">
-    <h2>🚑  الأسطول</h2>
+    <h2>🚑 شيت الأسطول</h2>
     <div class="أزرار-رأس-الصفحة">
       <span id="عداد_الاسطول" style="font-size:12px;color:var(--نص-رمادي)"></span>
       <button class="زر زر-تصدير" onclick="window.print()">📄 طباعة</button>
@@ -775,10 +791,11 @@ table { width: 100%; min-width: 550px; }
             <th>المركز</th>
             <th>الحالة</th>
             <th>آخر قراءة عداد</th>
+            <th>ملف المركبة</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td colspan="9" style="padding:30px;color:var(--نص-رمادي)">جاري تحميل البيانات...</td></tr>
+          <tr><td colspan="10" style="padding:30px;color:var(--نص-رمادي)">جاري تحميل البيانات...</td></tr>
         </tbody>
       </table>
     </div>
@@ -868,6 +885,50 @@ table { width: 100%; min-width: 550px; }
             <option value="صيانة">🔧 صيانة</option>
             <option value="في مهمة">🚑 في مهمة</option>
           </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>نوع الحركة <span class="مطلوب">*</span></label>
+          <select id="رصد_نوع_الحركة" required>
+            <option value="تحديث موقع">تحديث موقع المركبة</option>
+            <option value="نقل أو تدعيم">نقل أو تدعيم بين القطاعات/المراكز</option>
+            <option value="دخول صيانة">دخول إلى الصيانة</option>
+            <option value="خروج صيانة">خروج من الصيانة</option>
+            <option value="استلام وتسليم">استلام وتسليم مركبة</option>
+            <option value="تغيير قطاع">تغيير قطاع</option>
+            <option value="تغيير مركز">تغيير مركز</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>سبب الحركة أو التدعيم</label>
+          <input type="text" id="رصد_سبب_الحركة" placeholder="مثال: تدعيم تشغيلي أو إحالة للصيانة">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>القطاع السابق</label>
+          <input type="text" id="رصد_قطاع_سابق" readonly placeholder="يُسحب من ملف المركبة">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>المركز السابق</label>
+          <input type="text" id="رصد_مركز_سابق" readonly placeholder="يُسحب من ملف المركبة">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>جهة التسليم</label>
+          <input type="text" id="رصد_جهة_التسليم" placeholder="المركز أو الإدارة المسلِّمة">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>جهة الاستلام</label>
+          <input type="text" id="رصد_جهة_الاستلام" placeholder="المركز أو الإدارة المستلمة">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>اسم المسلم</label>
+          <input type="text" id="رصد_اسم_المسلم" placeholder="الاسم">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>اسم المستلم</label>
+          <input type="text" id="رصد_اسم_المستلم" placeholder="الاسم">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>رقم محضر الاستلام والتسليم</label>
+          <input type="text" id="رصد_محضر_التسليم" placeholder="اختياري">
         </div>
         <div class="مجموعة-حقل عرض-كامل">
           <label>ملاحظات</label>
@@ -1038,6 +1099,18 @@ table { width: 100%; min-width: 550px; }
           <input type="date" id="صيانة_تاريخ" required>
         </div>
         <div class="مجموعة-حقل">
+          <label>وقت دخول الصيانة</label>
+          <input type="time" id="صيانة_وقت_دخول">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>تاريخ خروج الصيانة</label>
+          <input type="date" id="صيانة_تاريخ_خروج">
+        </div>
+        <div class="مجموعة-حقل">
+          <label>وقت خروج الصيانة</label>
+          <input type="time" id="صيانة_وقت_خروج">
+        </div>
+        <div class="مجموعة-حقل">
           <label>رقم اللوحة <span class="مطلوب">*</span></label>
           <div class="حاوية-بحث-لوحة">
             <div class="قيمة-مختارة-لوحة" id="صيانة_لوحة_عرض">
@@ -1114,6 +1187,41 @@ table { width: 100%; min-width: 550px; }
           <label>قطع الغيار</label>
           <select id="صيانة_قطع_غيار">
             <option value="">-- اختر --</option>
+          </select>
+        </div>
+        <div class="مجموعة-حقل عرض-كامل">
+          <div class="لوحة-اصلاحات">
+            <label>الإصلاحات المنفذة <span class="مطلوب">*</span></label>
+            <div id="صيانة_قائمة_اصلاحات" class="قائمة-اصلاحات"></div>
+            <div class="صف-إضافة-إصلاح">
+              <select id="صيانة_اصلاح_إضافي"><option value="">-- اختر إصلاحاً لإضافته --</option></select>
+              <button type="button" class="زر زر-ثانوي" onclick="إضافة_اصلاح_من_القائمة()">＋ إضافة</button>
+              <input type="text" id="صيانة_اصلاح_مخصص" placeholder="إصلاح آخر أو تفصيل إضافي">
+              <button type="button" class="زر زر-ثانوي" onclick="إضافة_اصلاح_مخصص()">＋ حفظ الإضافة</button>
+            </div>
+          </div>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>هل تم تغيير زيت المحرك أثناء الصيانة؟ <span class="مطلوب">*</span></label>
+          <select id="صيانة_تم_تغيير_زيت" onchange="تبديل_تفاصيل_زيت_الصيانة()">
+            <option value="لا">لا</option>
+            <option value="نعم">نعم، تم تغيير الزيت</option>
+          </select>
+        </div>
+        <div id="صيانة_تفاصيل_زيت" class="مجموعة-حقل عرض-كامل معلومات-زيت-ضمن-صيانة" style="display:none">
+          <label>تفاصيل الزيت المستخدم ضمن الصيانة</label>
+          <div class="شبكة-نموذج">
+            <div class="مجموعة-حقل"><label>نوع الزيت</label><input type="text" id="صيانة_نوع_زيت" placeholder="مثال: 5W-30"></div>
+            <div class="مجموعة-حقل"><label>الفني المنفذ للزيت</label><input type="text" id="صيانة_فني_زيت" placeholder="يُستخدم الفني المسؤول إن ترك فارغاً"></div>
+            <div class="مجموعة-حقل عرض-كامل"><label>ملاحظات تغيير الزيت</label><input type="text" id="صيانة_ملاحظات_زيت" placeholder="مثال: تغيير الزيت والفلتر"></div>
+          </div>
+        </div>
+        <div class="مجموعة-حقل">
+          <label>حالة المركبة بعد الصيانة</label>
+          <select id="صيانة_حالة_بعد">
+            <option value="عاملة">✅ عاملة وجاهزة</option>
+            <option value="صيانة">🔧 تحتاج متابعة صيانة</option>
+            <option value="خارج الخدمة">❌ خارج الخدمة</option>
           </select>
         </div>
         <div class="مجموعة-حقل عرض-كامل">
@@ -1337,7 +1445,7 @@ table { width: 100%; min-width: 550px; }
 </div>
 
 <!-- ====== السكريبتات ====== -->
-<script src="data.js?v=4.0"></script>
+<script src="data.js?v=4.2"></script>
 <script>
 // رابط Google Apps Script - يتم تحديثه هنا
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgDb9ZI9k7Ccws8zcGr78H5UHXWLgNzRKBTyGIfINsOg2hqxLXkvuatF7eKJtr-Y8/exec';
@@ -1381,7 +1489,7 @@ window.addEventListener('DOMContentLoaded', function() {
   };
 });
 </script>
-<script src="app.js?v=4.0"></script>
+<script src="app.js?v=4.2"></script>
 
 <!-- ====== مكوّن البحث في قوائم اللوحات ====== -->
 <script>
@@ -1528,5 +1636,15 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+<!-- نافذة ملف المركبة الموحد -->
+<div id="نافذة_ملف_المركبة" onclick="if(event.target===this)إغلاق_ملف_المركبة()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999;overflow-y:auto;padding:15px 0">
+  <div class="نافذة-تعديل-محتوى" style="max-width:980px">
+    <div class="نافذة-تعديل-رأس">
+      <h3 id="عنوان_ملف_المركبة" class="نافذة-تعديل-عنوان">📁 ملف المركبة</h3>
+      <button type="button" class="زر-إغلاق-نافذة" onclick="إغلاق_ملف_المركبة()" title="إغلاق">✕</button>
+    </div>
+    <div id="محتوى_ملف_المركبة"></div>
+  </div>
+</div>
 </body>
 </html>
