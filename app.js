@@ -726,7 +726,7 @@ function تهيئة_الرسوم_البيانية() {
       },
       options: {
         responsive: true,
-        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Cairo' }, color: '#ccc' } } }
+        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Cairo' }, color: '#334155' } } }
       }
     });
   }
@@ -742,8 +742,8 @@ function تهيئة_الرسوم_البيانية() {
       },
       options: {
         responsive: true,
-        plugins: { legend: { labels: { font: { family: 'Cairo' }, color: '#ccc' } } },
-        scales: { x: { ticks: { color: '#aaa', font: { family: 'Cairo' } } }, y: { ticks: { color: '#aaa' }, beginAtZero: true } }
+        plugins: { legend: { labels: { font: { family: 'Cairo' }, color: '#334155' } } },
+        scales: { x: { ticks: { color: '#64748b', font: { family: 'Cairo' } } }, y: { ticks: { color: '#64748b' }, beginAtZero: true } }
       }
     });
   }
@@ -759,8 +759,8 @@ function تهيئة_الرسوم_البيانية() {
       },
       options: {
         responsive: true,
-        plugins: { legend: { labels: { font: { family: 'Cairo' }, color: '#ccc' } } },
-        scales: { x: { ticks: { color: '#aaa', font: { family: 'Cairo' } } }, y: { ticks: { color: '#aaa' }, beginAtZero: true } }
+        plugins: { legend: { labels: { font: { family: 'Cairo' }, color: '#334155' } } },
+        scales: { x: { ticks: { color: '#64748b', font: { family: 'Cairo' } } }, y: { ticks: { color: '#64748b' }, beginAtZero: true } }
       }
     });
   }
@@ -776,7 +776,7 @@ function تهيئة_الرسوم_البيانية() {
       options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { x: { ticks: { color: '#aaa', font: { family: 'Cairo' } } }, y: { ticks: { color: '#aaa' }, beginAtZero: true } }
+        scales: { x: { ticks: { color: '#64748b', font: { family: 'Cairo' } } }, y: { ticks: { color: '#64748b' }, beginAtZero: true } }
       }
     });
   }
@@ -1375,7 +1375,7 @@ function توليد_التقرير() {
 
   حاوية.innerHTML = '<div id="التقرير_للطباعة" class="تقرير-كامل">' +
     '<div class="رأس-التقرير">' +
-    '<div class="شعار-التقرير">🌙</div>' +
+    '<div class="شعار-التقرير">🚑</div>' +
     '<div class="معلومات-التقرير">' +
     '<h2>هيئة الهلال الأحمر السعودي</h2>' +
     '<h3>منصة صيانة وتشغيل الأسطول - منطقة الرياض</h3>' +
