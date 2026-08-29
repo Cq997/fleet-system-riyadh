@@ -671,7 +671,7 @@ tbody tr:hover { background:#f0fdfa; }
   </nav>
   <div class="تذييل-الشريط">
     <div>👤 ثامر عياد الحربي</div>
-    <div>💻 000</div>
+    <div>💻 علي 102459@srca</div>
     <div id="حالة_الاتصال" class="حالة-الاتصال غير-متصل">
       <span class="نقطة-الحالة"></span>
       <span id="نص_الحالة">جاري الاتصال...</span>
@@ -812,7 +812,7 @@ tbody tr:hover { background:#f0fdfa; }
 =========================================== -->
 <section id="قسم_الأسطول" class="قسم-محتوى">
   <div class="رأس-الصفحة">
-    <h2>🚑 الأسطول</h2>
+    <h2>🚑  الأسطول</h2>
     <div class="أزرار-رأس-الصفحة">
       <span id="عداد_الاسطول" style="font-size:12px;color:var(--نص-رمادي)"></span>
       <button class="زر زر-تصدير" onclick="window.print()">📄 طباعة</button>
@@ -1065,7 +1065,7 @@ tbody tr:hover { background:#f0fdfa; }
             <option value="الدفاع المدني">الدفاع المدني</option>
             <option value="الشرطة">الشرطة</option>
             <option value="هيئة الهلال الأحمر السعودي">هيئة الهلال الأحمر السعودي</option>
-            <option value="نجم">نجم</option>
+            <option value="شركة التأمين">شركة التأمين</option>
             <option value="الجهة المشغلة">الجهة المشغلة</option>
             <option value="أخرى">أخرى</option>
           </select>
@@ -1088,6 +1088,10 @@ tbody tr:hover { background:#f0fdfa; }
         <div class="عنصر-معلومات">
           <span class="تسمية-معلومات">الحالة</span>
           <span class="قيمة-معلومات" id="حادث_حالة_عرض">-</span>
+        </div>
+        <div class="عنصر-معلومات">
+          <span class="تسمية-معلومات">اسم قائد المركبة</span>
+          <span class="قيمة-معلومات" id="حادث_قائد_عرض">-</span>
         </div>
       </div>
 
@@ -1120,6 +1124,7 @@ tbody tr:hover { background:#f0fdfa; }
       <input type="hidden" id="حادث_نوع">
       <input type="hidden" id="حادث_موديل">
       <input type="hidden" id="حادث_شاصي">
+      <input type="hidden" id="حادث_قائد">
       <button type="submit" class="زر-حفظ">🚧 تسجيل الحادث</button>
     </form>
   </div>
@@ -1133,13 +1138,13 @@ tbody tr:hover { background:#f0fdfa; }
     <div class="جدول-متجاوب">
       <table id="جدول_الحوادث">
         <thead>
-          <tr>
-            <th>رقم الطلب</th><th>التاريخ</th><th>رقم اللوحة</th>
-            <th>نوع الحادث</th><th>نسبة الخطأ</th><th>القطاع</th><th>الحالة</th><th>إجراء</th>
-          </tr>
+            <tr>
+              <th>رقم الطلب</th><th>التاريخ</th><th>رقم اللوحة</th><th>قائد المركبة</th>
+              <th>نوع الحادث</th><th>نسبة الخطأ</th><th>القطاع</th><th>الحالة</th><th>إجراء</th>
+            </tr>
         </thead>
         <tbody>
-          <tr><td colspan="7" style="padding:20px;color:var(--نص-رمادي)">لا توجد سجلات</td></tr>
+          <tr><td colspan="9" style="padding:20px;color:var(--نص-رمادي)">لا توجد سجلات</td></tr>
         </tbody>
       </table>
     </div>
@@ -1509,10 +1514,10 @@ tbody tr:hover { background:#f0fdfa; }
 </div>
 
 <!-- ====== السكريبتات ====== -->
-<script src="data.js?v=4.2"></script>
+<script src="data.js?v=4.3"></script>
 <script>
 // رابط Google Apps Script - يتم تحديثه هنا
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfF4wo1Q-E_VXsVhAGEmhNlYRu834N0sVvfiRpKIMvFFjEuqWPO4w-INZA_QzNCKo/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgDb9ZI9k7Ccws8zcGr78H5UHXWLgNzRKBTyGIfINsOg2hqxLXkvuatF7eKJtr-Y8/exec';
 
 // دوال مساعدة إضافية
 function تغيير_نوع_التقرير() {
@@ -1553,7 +1558,7 @@ window.addEventListener('DOMContentLoaded', function() {
   };
 });
 </script>
-<script src="app.js?v=4.2"></script>
+<script src="app.js?v=4.3"></script>
 
 <!-- ====== مكوّن البحث في قوائم اللوحات ====== -->
 <script>
