@@ -10,18 +10,18 @@
   --srca-green-light: #22a050;
   --srca-red: #c0392b;
   --srca-gold: #f0a500;
-  --bg-dark: #0d1117;
-  --bg-card: #161b22;
-  --bg-sidebar: #0d1117;
-  --bg-form: #161b22;
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --border-color: #30363d;
+  --bg-dark: #f5f7f9;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-form: #ffffff;
+  --text-primary: #263238;
+  --text-secondary: #48606b;
+  --border-color: #d9e2e8;
   --success: #238636;
   --warning: #d29922;
   --danger: #da3633;
   --info: #1f6feb;
-  --shadow: 0 4px 20px rgba(0,0,0,0.4);
+  --shadow: 0 4px 20px rgba(31,55,70,0.10);
   --radius: 10px;
   --transition: 0.3s ease;
 }
